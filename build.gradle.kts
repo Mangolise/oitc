@@ -16,6 +16,10 @@ dependencies {
     implementation("net.minestom:minestom-snapshots:6c5cd6544e")
 }
 
+java {
+    withSourcesJar()
+}
+
 tasks.withType<Jar> {
     manifest {
         // Change this to your main class
