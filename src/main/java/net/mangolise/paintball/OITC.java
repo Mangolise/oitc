@@ -3,7 +3,8 @@ package net.mangolise.paintball;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.mangolise.gamesdk.BaseGame;
-import net.mangolise.gamesdk.util.Util;
+import net.mangolise.gamesdk.util.GameSdkUtils;
+import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
@@ -67,8 +68,8 @@ public class OITC extends BaseGame<OITC.Config> {
 
             player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1000);
 
-            player.teleport(Util.getSpawnPosition(instance));
-            player.setRespawnPoint(Util.getSpawnPosition(instance));
+            player.teleport(GameSdkUtils.getSpawnPosition(instance));
+            player.setRespawnPoint(GameSdkUtils.getSpawnPosition(instance));
 
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
@@ -128,7 +129,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
 
     public void attacked(Player victim, Player attacker) {
-        if (victim.getTag(PLAYER_INVINCIBLE)) {
+        if (victim.getTag(PLAYER_INVINCIBLE) || attacker.getTag(PLAYER_INVINCIBLE)) {
             return;
         }
 
@@ -136,19 +137,17 @@ public class OITC extends BaseGame<OITC.Config> {
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
-        MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+        Timer.countDownForPlayer(3, victim).thenRun(() -> {
             victim.setGameMode(GameMode.ADVENTURE);
             victim.teleport(randomSpawn().withView(victim.getPosition()));
 
-            MinecraftServer.getSchedulerManager().scheduleTask(() -> {
-                victim.setTag(PLAYER_INVINCIBLE, false);
-            }, TaskSchedule.seconds(5), TaskSchedule.stop());
-        }, TaskSchedule.seconds(3), TaskSchedule.stop());
-
-        setAmmo(victim, 1);
+            MinecraftServer.getSchedulerManager().scheduleTask(() -> victim.setTag(PLAYER_INVINCIBLE, false), TaskSchedule.seconds(5), TaskSchedule.stop());
+        });
 
         attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
         setAmmo(attacker, attacker.getTag(PLAYERS_AMMO_TAG) + 1);
+
+        setAmmo(victim, 1);
 
         kills.put(attacker.getUuid(), kills.get(attacker.getUuid()) + 1);
         updateSidebar();
@@ -188,7 +187,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
         int posX = random.nextInt(radius);
         int posZ = random.nextInt(radius);
-        int posY = Util.getHighestBlock(instance, posX, posZ) + 1;
+        int posY = GameSdkUtils.getHighestBlock(instance, posX, posZ) + 1;
 
         return new Pos(posX, posY, posZ);
     }
