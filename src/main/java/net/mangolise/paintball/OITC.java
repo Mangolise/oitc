@@ -25,6 +25,7 @@ import net.minestom.server.item.Material;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.*;
 import java.util.List;
@@ -37,6 +38,7 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
+    static final Tag<Boolean> PLAYER_INVINCIBLE = Tag.Boolean("player_invincibility").defaultValue(false);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(new AnvilLoader("worlds/fruit"));
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
@@ -126,9 +128,23 @@ public class OITC extends BaseGame<OITC.Config> {
 
 
     public void attacked(Player victim, Player attacker) {
+        if (victim.getTag(PLAYER_INVINCIBLE)) {
+            return;
+        }
+
         victim.sendMessage("You were Killed!");
-        victim.teleport(randomSpawn().withView(victim.getPosition()));
+        victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
+
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            victim.setGameMode(GameMode.ADVENTURE);
+            victim.teleport(randomSpawn().withView(victim.getPosition()));
+
+            MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+                victim.setTag(PLAYER_INVINCIBLE, false);
+            }, TaskSchedule.seconds(5), TaskSchedule.stop());
+        }, TaskSchedule.seconds(3), TaskSchedule.stop());
+
         setAmmo(victim, 1);
 
         attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
@@ -136,8 +152,9 @@ public class OITC extends BaseGame<OITC.Config> {
 
         kills.put(attacker.getUuid(), kills.get(attacker.getUuid()) + 1);
         updateSidebar();
-    }
 
+        victim.setTag(PLAYER_INVINCIBLE, true);
+    }
 
     public void setAmmo(Player player, int amount) {
         player.setTag(PLAYERS_AMMO_TAG, amount);
