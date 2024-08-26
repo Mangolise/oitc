@@ -23,6 +23,10 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
@@ -138,10 +142,14 @@ public class OITC extends BaseGame<OITC.Config> {
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
         Timer.countDownForPlayer(3, victim).thenRun(() -> {
+            victim.setGlowing(true);
             victim.setGameMode(GameMode.ADVENTURE);
             victim.teleport(randomSpawn().withView(victim.getPosition()));
 
-            MinecraftServer.getSchedulerManager().scheduleTask(() -> victim.setTag(PLAYER_INVINCIBLE, false), TaskSchedule.seconds(5), TaskSchedule.stop());
+            Timer.countDownForPlayer(5, victim).thenRun(() -> {
+                victim.setGlowing(false);
+                victim.setTag(PLAYER_INVINCIBLE, false);
+            });
         });
 
         attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
@@ -151,6 +159,9 @@ public class OITC extends BaseGame<OITC.Config> {
 
         kills.put(attacker.getUuid(), kills.get(attacker.getUuid()) + 1);
         updateSidebar();
+
+        Particle particle = Particle.POOF;
+        poof(particle, victim, 0.1f);
 
         victim.setTag(PLAYER_INVINCIBLE, true);
     }
@@ -204,6 +215,15 @@ public class OITC extends BaseGame<OITC.Config> {
             i.getAndIncrement();
         });
     }
+
+
+    public void poof(Particle particle, Player victim, float ExplosionSpeed) {
+        Pos playerPos = victim.getPosition();
+
+        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, 30);
+        instance.sendGroupedPacket(packet);
+    }
+
 
     @Override
     public List<Feature<?>> features() {
