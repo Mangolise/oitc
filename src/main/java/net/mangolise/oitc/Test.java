@@ -1,4 +1,4 @@
-package net.mangolise.paintball;
+package net.mangolise.oitc;
 
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
@@ -14,8 +14,6 @@ public class Test {
         OITC.Config config = new OITC.Config();
         OITC game = new OITC(config);
         game.setup();
-
-
 
         if (GameSdkUtils.useBungeeCord()) {
             BungeeCordProxy.enable();

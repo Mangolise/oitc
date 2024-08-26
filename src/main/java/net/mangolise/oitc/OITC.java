@@ -1,4 +1,4 @@
-package net.mangolise.paintball;
+package net.mangolise.oitc;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -7,6 +7,7 @@ import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.entity.EntityAttackEvent;
@@ -25,12 +26,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
-import net.minestom.server.timer.TaskSchedule;
 
 import java.util.*;
 import java.util.List;
@@ -78,7 +76,7 @@ public class OITC extends BaseGame<OITC.Config> {
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
 
-            setAmmo(e.getPlayer(), 1);
+            setAmmo(e.getPlayer(), 64);
             sidebar.addViewer(player);
             kills.put(player.getUuid(), 0);
             updateSidebar();
@@ -98,26 +96,24 @@ public class OITC extends BaseGame<OITC.Config> {
             ItemStack heldItem = e.getItemStack();
 
             if (heldItem.material() != Material.CROSSBOW || player.getTag(PLAYERS_AMMO_TAG) <= 0) {
-               return;
+                return;
             }
 
             Pos spawnPosition = new Pos(player.getPosition().add(0, 1.5, 0));
 
-            Entity arrow = new EntityProjectile(player, EntityType.ARROW);
+            ArrowEntity arrow = new ArrowEntity(player);
             arrow.setInstance(instance, spawnPosition);
-
             arrow.setVelocity(player.getPosition().direction().mul(75));
 
             setAmmo(player, player.getTag(PLAYERS_AMMO_TAG) - 1);
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(ProjectileCollideWithEntityEvent.class, e -> {
-            Entity entity = e.getTarget();
+            if (!(e.getEntity() instanceof ArrowEntity arrowEntity)) return;
+            if (!(e.getTarget() instanceof Player player)) return;
 
-            if (entity instanceof Player player) {
-                if (e.getEntity() instanceof EntityProjectile projectile && projectile.getShooter() instanceof Player shooter) {
-                    attacked(player, shooter);
-                }
+            if (arrowEntity.getShooter() instanceof Player shooter) {
+                attacked(player, shooter);
             }
             e.getEntity().remove();
         });
