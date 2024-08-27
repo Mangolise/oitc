@@ -3,11 +3,11 @@ package net.mangolise.oitc;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.mangolise.gamesdk.BaseGame;
+import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
 import net.minestom.server.event.entity.EntityAttackEvent;
@@ -41,7 +41,6 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
-    static final Tag<Boolean> PLAYER_INVINCIBLE = Tag.Boolean("player_invincibility").defaultValue(false);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(new AnvilLoader("worlds/fruit"));
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
@@ -61,6 +60,7 @@ public class OITC extends BaseGame<OITC.Config> {
             Player player = e.getPlayer();
 
             e.setSpawningInstance(instance);
+            instance.setTimeRate(0);
 
             player.setGameMode(GameMode.ADVENTURE);
         });
@@ -70,13 +70,13 @@ public class OITC extends BaseGame<OITC.Config> {
 
             player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1000);
 
-            player.teleport(GameSdkUtils.getSpawnPosition(instance));
             player.setRespawnPoint(GameSdkUtils.getSpawnPosition(instance));
+            player.teleport(randomSpawn().add(0, 1, 0));
 
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
 
-            setAmmo(e.getPlayer(), 64);
+            setAmmo(e.getPlayer(), 1);
             sidebar.addViewer(player);
             kills.put(player.getUuid(), 0);
             updateSidebar();
@@ -129,7 +129,8 @@ public class OITC extends BaseGame<OITC.Config> {
 
 
     public void attacked(Player victim, Player attacker) {
-        if (victim.getTag(PLAYER_INVINCIBLE) || attacker.getTag(PLAYER_INVINCIBLE)) {
+        if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
+                victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
@@ -138,14 +139,8 @@ public class OITC extends BaseGame<OITC.Config> {
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
         Timer.countDownForPlayer(3, victim).thenRun(() -> {
-            victim.setGlowing(true);
             victim.setGameMode(GameMode.ADVENTURE);
-            victim.teleport(randomSpawn().withView(victim.getPosition()));
-
-            Timer.countDownForPlayer(5, victim).thenRun(() -> {
-                victim.setGlowing(false);
-                victim.setTag(PLAYER_INVINCIBLE, false);
-            });
+            victim.teleport(randomSpawn());
         });
 
         attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
@@ -158,8 +153,6 @@ public class OITC extends BaseGame<OITC.Config> {
 
         Particle particle = Particle.POOF;
         poof(particle, victim, 0.1f);
-
-        victim.setTag(PLAYER_INVINCIBLE, true);
     }
 
     public void setAmmo(Player player, int amount) {
@@ -190,13 +183,14 @@ public class OITC extends BaseGame<OITC.Config> {
     public Pos randomSpawn() {
         Random random = new Random();
 
-        int radius = 20;
+        List<Pos> spawnPositions = List.of(
+                new Pos(-0.5, 29, 36.5, 180, 0),
+                new Pos(-0.5, 29, -43.5, 0, 0),
+                new Pos(38.5, 29, -0.5, 90, 0),
+                new Pos(-45.5, 28, -0.5, -90, 0)
+        );
 
-        int posX = random.nextInt(radius);
-        int posZ = random.nextInt(radius);
-        int posY = GameSdkUtils.getHighestBlock(instance, posX, posZ) + 1;
-
-        return new Pos(posX, posY, posZ);
+        return spawnPositions.get(random.nextInt(0, 4));
     }
 
 
@@ -223,7 +217,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of();
+        return List.of(new AdminCommandsFeature());
     }
 
 
