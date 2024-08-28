@@ -2,6 +2,8 @@ package net.mangolise.oitc;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.util.GameSdkUtils;
@@ -19,7 +21,6 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.instance.anvil.AnvilLoader;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
@@ -157,7 +158,11 @@ public class OITC extends BaseGame<OITC.Config> {
 
     public void setAmmo(Player player, int amount) {
         player.setTag(PLAYERS_AMMO_TAG, amount);
+
         if (amount <= 0) {
+            Timer.countDown(10, i -> {
+                player.sendActionBar(Component.text(i).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
+            }).thenRun(() -> setAmmo(player, amount + 1));
             player.getInventory().setItemStack(findCrossbow(player), crossbow);
         } else {
             player.getInventory().setItemStack(findCrossbow(player), chargedCrossbow);
