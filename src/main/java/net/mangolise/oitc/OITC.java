@@ -42,7 +42,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
 
-    Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(new AnvilLoader("worlds/fruit"));
+    Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
     ItemStack arrow = ItemStack.of(Material.ARROW);
     ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow));

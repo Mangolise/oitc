@@ -23,6 +23,11 @@ java {
     withSourcesJar()
 }
 
+tasks.register("packageWorlds", net.mangolise.gamesdk.gradle.PackageWorldTask::class.java)
+tasks.processResources {
+    dependsOn("packageWorlds")
+}
+
 publishing {
     repositories {
         maven {
