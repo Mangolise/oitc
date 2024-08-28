@@ -15,7 +15,10 @@ import net.minestom.server.event.entity.projectile.ProjectileUncollideEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.network.packet.server.play.ParticlePacket;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.thread.Acquirable;
+import net.minestom.server.utils.PacketUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,6 +99,20 @@ public class ArrowEntity extends Entity {
         if (super.isRemoved()) return;
 
         final Pos posNow = getPosition();
+
+        double step = 0.1;
+
+        double travelled = 0;
+        double total = posNow.distance(posBefore);
+
+        while (travelled < total) {
+            Pos pos = posBefore.add(posNow.sub(posBefore).asVec().normalize().mul(travelled));
+            ParticlePacket packet = new ParticlePacket(Particle.SCULK_SOUL, pos, Vec.ZERO, 0, 1);
+            PacketUtils.sendGroupedPacket(this.getViewers(), packet);
+            travelled += step;
+        }
+
+
         if (isStuck(posBefore, posNow)) {
             if (super.onGround) {
                 return;
@@ -195,7 +212,7 @@ public class ArrowEntity extends Entity {
     @ApiStatus.Experimental
     @SuppressWarnings("unchecked")
     @Override
-    public @NotNull Acquirable<? extends EntityProjectile> acquirable() {
-        return (Acquirable<? extends EntityProjectile>) super.acquirable();
+    public @NotNull Acquirable<? extends ArrowEntity> acquirable() {
+        return (Acquirable<? extends ArrowEntity>) super.acquirable();
     }
 }
