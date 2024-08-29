@@ -15,6 +15,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -167,6 +168,9 @@ public class OITC extends BaseGame<OITC.Config> {
 
         kills.put(attacker.getUuid(), kills.get(attacker.getUuid()) + 1);
         updateSidebar();
+
+        KillEvent killEvent = new KillEvent(victim, attacker, kills.get(attacker.getUuid()));
+        EventDispatcher.call(killEvent);
 
         Particle particle = Particle.POOF;
         poof(particle, victim, 0.1f);
