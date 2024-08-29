@@ -4,8 +4,6 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.mangolise.anticheat.MangoAC;
-import net.mangolise.anticheat.events.PlayerFlagEvent;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
@@ -137,12 +135,6 @@ public class OITC extends BaseGame<OITC.Config> {
                 attacked(player, attacker);
             }
         });
-
-        new MangoAC(new MangoAC.Config(false, List.of(), List.of())).start();
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerFlagEvent.class, e ->
-                e.player().sendMessage(Component
-                        .text("You have been flagged for " + e.checkName() + " with a certainty of " + e.certainty())
-                        .color(NamedTextColor.RED)));
     }
 
 
