@@ -33,6 +33,7 @@ import net.minestom.server.tag.Tag;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OITC extends BaseGame<OITC.Config> {
@@ -47,6 +48,7 @@ public class OITC extends BaseGame<OITC.Config> {
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
     ItemStack arrow = ItemStack.of(Material.ARROW);
     ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow));
+    Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
 
     Sidebar sidebar = new Sidebar(Component.text("Scoreboard"));
     Map<UUID, Integer> kills = new HashMap<>();
@@ -159,10 +161,21 @@ public class OITC extends BaseGame<OITC.Config> {
     public void setAmmo(Player player, int amount) {
         player.setTag(PLAYERS_AMMO_TAG, amount);
 
+        if (arrowCountdown.containsKey(player.getUuid())) {
+            CompletableFuture<Void> timer = arrowCountdown.get(player.getUuid());
+            timer.complete(null);
+            player.sendActionBar(Component.text());
+        }
+
         if (amount <= 0) {
-            Timer.countDown(10, i -> {
+            CompletableFuture<Void> timer = Timer.countDown(10, i -> {
                 player.sendActionBar(Component.text(i).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
-            }).thenRun(() -> setAmmo(player, amount + 1));
+            });
+            timer.thenRun(() -> {
+                setAmmo(player, amount + 1);
+                player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 2f));
+            });
+            arrowCountdown.put(player.getUuid(), timer);
             player.getInventory().setItemStack(findCrossbow(player), crossbow);
         } else {
             player.getInventory().setItemStack(findCrossbow(player), chargedCrossbow);
