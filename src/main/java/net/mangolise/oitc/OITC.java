@@ -115,6 +115,8 @@ public class OITC extends BaseGame<OITC.Config> {
             arrow.setInstance(instance, spawnPosition);
             arrow.setVelocity(player.getPosition().direction().mul(75));
 
+            instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 2f, 1f), player.getPosition());
+
             setAmmo(player, player.getTag(PLAYERS_AMMO_TAG) - 1);
         });
 
@@ -183,7 +185,7 @@ public class OITC extends BaseGame<OITC.Config> {
             });
             timer.thenRun(() -> {
                 setAmmo(player, amount + 1);
-                player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 2f));
+                player.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_3, Sound.Source.PLAYER, 1f, 2f));
             });
             arrowCountdown.put(player.getUuid(), timer);
             player.getInventory().setItemStack(findCrossbow(player), crossbow);
@@ -245,7 +247,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature(), new NoCollisionFeature());
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature());
     }
 
 
