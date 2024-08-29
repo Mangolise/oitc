@@ -4,6 +4,8 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.anticheat.MangoAC;
+import net.mangolise.anticheat.events.PlayerFlagEvent;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
@@ -17,10 +19,7 @@ import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.item.ItemDropEvent;
-import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
-import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerSpawnEvent;
-import net.minestom.server.event.player.PlayerUseItemEvent;
+import net.minestom.server.event.player.*;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemComponent;
@@ -44,7 +43,7 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
-    public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.SONIC_BOOM);
+    public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.CRIT);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
@@ -91,6 +90,11 @@ public class OITC extends BaseGame<OITC.Config> {
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> kills.remove(e.getPlayer().getUuid()));
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, e -> {
+            if (e.getPlayer().getHeldSlot() == 8) {
+                e.setCancelled(true);
+            }
+        });
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
             if (e.getSlot() == 8) {
@@ -132,6 +136,12 @@ public class OITC extends BaseGame<OITC.Config> {
                 attacked(player, attacker);
             }
         });
+
+        new MangoAC(new MangoAC.Config(false, List.of(), List.of())).start();
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerFlagEvent.class, e ->
+                e.player().sendMessage(Component
+                        .text("You have been flagged for " + e.checkName() + " with a certainty of " + e.certainty())
+                        .color(NamedTextColor.RED)));
     }
 
 
@@ -172,7 +182,7 @@ public class OITC extends BaseGame<OITC.Config> {
         }
 
         if (amount <= 0) {
-            CompletableFuture<Void> timer = Timer.countDown(1, i -> {
+            CompletableFuture<Void> timer = Timer.countDown(10, i -> {
                 player.sendActionBar(Component.text(i).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
             });
             timer.thenRun(() -> {

@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation("net.mangolise:mango-game-sdk:latest")
+    implementation("net.mangolise:mango-anti-cheat:latest")
     implementation("net.minestom:minestom-snapshots:6c5cd6544e")
 }
 
