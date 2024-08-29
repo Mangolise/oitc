@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
+import net.mangolise.gamesdk.features.NoCollisionFeature;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
@@ -43,6 +44,7 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
+    public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.SONIC_BOOM);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
     ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
@@ -58,6 +60,8 @@ public class OITC extends BaseGame<OITC.Config> {
         super.setup();
 
         instance.enableAutoChunkLoad(true);
+
+        MinecraftServer.getCommandManager().register(new ParticleCommand());
 
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e -> {
             Player player = e.getPlayer();
@@ -168,7 +172,7 @@ public class OITC extends BaseGame<OITC.Config> {
         }
 
         if (amount <= 0) {
-            CompletableFuture<Void> timer = Timer.countDown(10, i -> {
+            CompletableFuture<Void> timer = Timer.countDown(1, i -> {
                 player.sendActionBar(Component.text(i).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
             });
             timer.thenRun(() -> {
@@ -235,7 +239,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature());
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature());
     }
 
 

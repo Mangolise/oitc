@@ -16,7 +16,6 @@ import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
-import net.minestom.server.particle.Particle;
 import net.minestom.server.thread.Acquirable;
 import net.minestom.server.utils.PacketUtils;
 import org.jetbrains.annotations.ApiStatus;
@@ -24,28 +23,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.mangolise.oitc.OITC.PLAYER_ARROW_PARTICLE;
+
 public class ArrowEntity extends Entity {
 
     private final Player shooter;
     private boolean wasStuck;
-    private Particle particle;
 
     public ArrowEntity(@Nullable Player shooter) {
         super(EntityType.ARROW);
         this.shooter = shooter;
         setup();
-
-        List<Particle> particles = List.copyOf(Particle.values());
-        particle = particles.get(ThreadLocalRandom.current().nextInt(particles.size()));
-
-        this.shooter.sendMessage("Particle: " + particle.name());
     }
 
     private void setup() {
@@ -114,7 +108,7 @@ public class ArrowEntity extends Entity {
 
         while (travelled < total) {
             Pos pos = posBefore.add(posNow.sub(posBefore).asVec().normalize().mul(travelled));
-            ParticlePacket packet = new ParticlePacket(particle, pos, Vec.ZERO, 0, 1);
+            ParticlePacket packet = new ParticlePacket(this.shooter.getTag(PLAYER_ARROW_PARTICLE), pos, Vec.ZERO, 0, 1);
             PacketUtils.sendGroupedPacket(this.getViewers(), packet);
             travelled += step;
         }
