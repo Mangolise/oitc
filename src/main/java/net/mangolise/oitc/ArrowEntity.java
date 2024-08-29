@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,11 +35,17 @@ public class ArrowEntity extends Entity {
 
     private final Player shooter;
     private boolean wasStuck;
+    private Particle particle;
 
     public ArrowEntity(@Nullable Player shooter) {
         super(EntityType.ARROW);
         this.shooter = shooter;
         setup();
+
+        List<Particle> particles = List.copyOf(Particle.values());
+        particle = particles.get(ThreadLocalRandom.current().nextInt(particles.size()));
+
+        this.shooter.sendMessage("Particle: " + particle.name());
     }
 
     private void setup() {
@@ -107,11 +114,10 @@ public class ArrowEntity extends Entity {
 
         while (travelled < total) {
             Pos pos = posBefore.add(posNow.sub(posBefore).asVec().normalize().mul(travelled));
-            ParticlePacket packet = new ParticlePacket(Particle.SCULK_SOUL, pos, Vec.ZERO, 0, 1);
+            ParticlePacket packet = new ParticlePacket(particle, pos, Vec.ZERO, 0, 1);
             PacketUtils.sendGroupedPacket(this.getViewers(), packet);
             travelled += step;
         }
-
 
         if (isStuck(posBefore, posNow)) {
             if (super.onGround) {
