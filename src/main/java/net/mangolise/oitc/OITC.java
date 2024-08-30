@@ -247,7 +247,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature());
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature(config()));
     }
 
 
