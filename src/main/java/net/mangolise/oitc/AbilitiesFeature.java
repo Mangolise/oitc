@@ -17,19 +17,25 @@ import net.minestom.server.tag.Tag;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AbilitiesFeature extends OITC implements Game.Feature<OITC> {
-    static final Tag<Boolean> PLAYER_CAN_DASH = Tag.Boolean("player_dash").defaultValue(true);
-
-    public AbilitiesFeature(Config config) {
-        super(config);
-    }
+public class AbilitiesFeature implements Game.Feature<OITC> {
+    public static final Tag<Boolean> PLAYER_CAN_DASH = Tag.Boolean("player_dash").defaultValue(true);
+    Map<UUID, CompletableFuture<Void>> dashCountDown = new HashMap<>();
 
     @Override
     public void setup(Context<OITC> context) {
         context.eventNode().addListener(PlayerSpawnEvent.class, e -> {
             e.getPlayer().setExp(1);
+        });
+
+        context.eventNode().addListener(KillEvent.class, e -> {
+            playerDashReset(e.getPlayer());
+            playerDashReset(e.getKiller());
         });
 
         context.eventNode().addListener(PlayerSwapItemEvent.class, e -> {
@@ -45,15 +51,17 @@ public class AbilitiesFeature extends OITC implements Game.Feature<OITC> {
 
                 playerDashParticle(player, instance);
 
-                Timer.countDown(5, i -> {
+                CompletableFuture<Void> timer = Timer.countDown(5, i -> {
                     player.setLevel(i);
                     player.setExp(1 - ((float) i / 5f));
-                }).thenRun(() -> {
+                });
+                timer.thenRun(() -> {
                     player.setTag(PLAYER_CAN_DASH, true);
                     player.setLevel(0);
                     player.setExp(1);
                     player.playSound(Sound.sound(SoundEvent.ITEM_BOTTLE_FILL_DRAGONBREATH, Sound.Source.PLAYER, 1f, 1f));
                 });
+                dashCountDown.put(player.getUuid(), timer);
             }
         });
     }
@@ -70,6 +78,14 @@ public class AbilitiesFeature extends OITC implements Game.Feature<OITC> {
 
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             task.get().cancel();
-        }, TaskSchedule.millis(500), TaskSchedule.stop());
+        }, TaskSchedule.millis(350), TaskSchedule.stop());
+    }
+
+    public void playerDashReset(Player player) {
+        player.setTag(PLAYER_CAN_DASH, true);
+        if (dashCountDown.containsKey(player.getUuid())) {
+            CompletableFuture<Void> timer = dashCountDown.get(player.getUuid());
+            timer.complete(null);
+        }
     }
 }

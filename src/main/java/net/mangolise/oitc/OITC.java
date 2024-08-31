@@ -80,6 +80,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
+            player.getInventory().setItemStack(7, ItemStack.of(Material.CHEST));
 
             setAmmo(e.getPlayer(), 1);
             sidebar.addViewer(player);
@@ -89,21 +90,30 @@ public class OITC extends BaseGame<OITC.Config> {
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> kills.remove(e.getPlayer().getUuid()));
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerSwapItemEvent.class, e -> {
-            if (e.getPlayer().getHeldSlot() == 8) {
-                e.setCancelled(true);
-            }
-        });
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
+            if (e.getClickedItem().material().equals(Material.CHEST)) {
+                ParticleMenu.openMenu(e.getPlayer());
+                e.setCancelled(true);
+                return;
+            }
+
             if (e.getSlot() == 8) {
                 e.setCancelled(true);
             }
+
+            ParticleMenu.handlePreClickEvent(e);
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, e -> {
             Player player = e.getPlayer();
             ItemStack heldItem = e.getItemStack();
+
+            if (heldItem.material().equals(Material.CHEST)) {
+                ParticleMenu.openMenu(player);
+                e.setCancelled(true);
+                return;
+            }
 
             if (heldItem.material() != Material.CROSSBOW || player.getTag(PLAYERS_AMMO_TAG) <= 0) {
                 return;
@@ -247,7 +257,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature(config()));
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature());
     }
 
 
