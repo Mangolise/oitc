@@ -21,7 +21,39 @@ import java.util.List;
 public class ParticleMenu {
     private static final Tag<Integer> ARROW_PARTICLE = Tag.Integer("arrow_particle");
     private static final List<ColoredParticle> particles = List.of(
-            new ColoredParticle(new Color(150, 255, 225), Particle.GLOW)
+            new ColoredParticle(new Color(240, 197, 67), Particle.TOTEM_OF_UNDYING),
+            new ColoredParticle(new Color(222, 91, 209), Particle.WITCH),
+            new ColoredParticle(new Color(242, 153, 233), Particle.CHERRY_LEAVES),
+            new ColoredParticle(new Color(35, 125, 41), Particle.SPORE_BLOSSOM_AIR),
+            new ColoredParticle(new Color(117, 34, 41), Particle.CRIMSON_SPORE),
+            new ColoredParticle(new Color(151, 234, 240), Particle.BUBBLE_COLUMN_UP),
+            new ColoredParticle(new Color(186, 131, 235), Particle.DRAGON_BREATH),
+            new ColoredParticle(new Color(121, 252, 213), Particle.GLOW),
+            new ColoredParticle(new Color(237, 132, 52), Particle.FLAME),
+            new ColoredParticle(new Color(77, 178, 250), Particle.TRIAL_SPAWNER_DETECTION),
+            new ColoredParticle(new Color(245, 171, 86), Particle.TRIAL_SPAWNER_DETECTION_OMINOUS),
+            new ColoredParticle(new Color(255, 141, 10), Particle.WAX_ON),
+            new ColoredParticle(new Color(50, 50, 50), Particle.MYCELIUM),
+            new ColoredParticle(new Color(117, 219, 240), Particle.SCULK_CHARGE_POP),
+            new ColoredParticle(new Color(255, 255, 225), Particle.ENCHANT),
+            new ColoredParticle(new Color(62, 156, 176), Particle.WARPED_SPORE),
+            new ColoredParticle(new Color(31, 110, 128), Particle.VIBRATION),
+            new ColoredParticle(new Color(234, 172, 250), Particle.ELECTRIC_SPARK),
+            new ColoredParticle(new Color(220, 211, 230), Particle.WHITE_ASH),
+            new ColoredParticle(new Color(255, 255, 255), Particle.END_ROD),
+            new ColoredParticle(new Color(255, 100, 28), Particle.DRIPPING_LAVA),
+            new ColoredParticle(new Color(28, 160, 255), Particle.DRIPPING_WATER),
+            new ColoredParticle(new Color(143, 100, 0), Particle.DRIPPING_HONEY),
+            new ColoredParticle(new Color(100, 0, 143), Particle.DRIPPING_OBSIDIAN_TEAR),
+            new ColoredParticle(new Color(219, 219, 219), Particle.FIREWORK),
+            new ColoredParticle(new Color(89, 111, 247), Particle.RAIN),
+            new ColoredParticle(new Color(72, 97, 250), Particle.FISHING),
+            new ColoredParticle(new Color(145, 145, 145), Particle.INFESTED),
+            new ColoredParticle(new Color(255, 132, 18), Particle.LAVA),
+            new ColoredParticle(new Color(148, 4, 196), Particle.REVERSE_PORTAL),
+            new ColoredParticle(new Color(232, 156, 56), Particle.SMALL_FLAME),
+            new ColoredParticle(new Color(199, 193, 185), Particle.SMALL_GUST),
+            new ColoredParticle(new Color(250, 236, 217), Particle.CRIT)
     );
 
     public static void openMenu(Player player) {

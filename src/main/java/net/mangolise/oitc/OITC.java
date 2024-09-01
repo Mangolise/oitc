@@ -80,7 +80,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
-            player.getInventory().setItemStack(7, ItemStack.of(Material.CHEST));
+            player.getInventory().setItemStack(8, ItemStack.of(Material.CHEST));
 
             setAmmo(e.getPlayer(), 1);
             sidebar.addViewer(player);
@@ -98,7 +98,7 @@ public class OITC extends BaseGame<OITC.Config> {
                 return;
             }
 
-            if (e.getSlot() == 8) {
+            if (e.getClickedItem().material().equals(Material.ARROW)) {
                 e.setCancelled(true);
             }
 
@@ -203,7 +203,7 @@ public class OITC extends BaseGame<OITC.Config> {
             player.getInventory().setItemStack(findCrossbow(player), chargedCrossbow);
         }
 
-        player.getInventory().setItemStack(8, arrow.withAmount(amount));
+        player.getInventory().setItemStack(7, arrow.withAmount(amount));
     }
 
 
