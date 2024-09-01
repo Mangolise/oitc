@@ -3,6 +3,7 @@ package net.mangolise.oitc;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
@@ -43,11 +44,16 @@ public class OITC extends BaseGame<OITC.Config> {
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
     public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.CRIT);
+    public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_count").defaultValue(0);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
-    ItemStack crossbow = ItemStack.of(Material.CROSSBOW);
-    ItemStack arrow = ItemStack.of(Material.ARROW);
-    ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow));
+
+    ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
+            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
+    ItemStack arrow = ItemStack.of(Material.ARROW)
+            .withCustomName(Component.text("Arrow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
+    ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow))
+            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
     Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
 
     Sidebar sidebar = new Sidebar(Component.text("Scoreboard"));
@@ -79,8 +85,10 @@ public class OITC extends BaseGame<OITC.Config> {
             player.teleport(randomSpawn().add(0, 1, 0));
 
             player.getInventory().addItemStack(chargedCrossbow);
-            player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD));
-            player.getInventory().setItemStack(8, ItemStack.of(Material.CHEST));
+            player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD)
+                    .withCustomName(Component.text("Iron Sword").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY)));
+            player.getInventory().setItemStack(8, ItemStack.of(Material.CHEST)
+                    .withCustomName(Component.text("Particle Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
             setAmmo(e.getPlayer(), 1);
             sidebar.addViewer(player);
@@ -149,14 +157,21 @@ public class OITC extends BaseGame<OITC.Config> {
         });
     }
 
-
     public void attacked(Player victim, Player attacker) {
+        int killCount = kills.get(attacker.getUuid()) + 1;
+
+        victim.setTag(PLAYER_KILL_STREAK, 0);
+        attacker.setTag(PLAYER_KILL_STREAK, attacker.getTag(PLAYER_KILL_STREAK) + 1);
+
         if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
                 victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
-        victim.sendMessage("You were Killed!");
+        instance.sendMessage(Component.text(victim.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)
+                .append(Component.text(" was Killed by ").decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
+                .append(Component.text(attacker.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)));
+
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
@@ -170,10 +185,35 @@ public class OITC extends BaseGame<OITC.Config> {
 
         setAmmo(victim, 1);
 
-        kills.put(attacker.getUuid(), kills.get(attacker.getUuid()) + 1);
+        kills.put(attacker.getUuid(), killCount);
         updateSidebar();
 
-        KillEvent killEvent = new KillEvent(victim, attacker, kills.get(attacker.getUuid()));
+        int killStreak = attacker.getTag(PLAYER_KILL_STREAK);
+
+        switch (killStreak) {
+            case 5 -> killStreakMessage(attacker, " is on ", "Fire", TextColor.color(255, 165, 43));
+            case 10 -> killStreakMessage(attacker, " is ", "Killing it", TextColor.color(163, 33, 0));
+            case 15 -> killStreakMessage(attacker, " is ", "Dominating", TextColor.color(92, 0, 2));
+            case 20 -> killStreakMessage(attacker, " is on a ", "Rampage", TextColor.color(255, 55, 30));
+            case 30 -> killStreakMessage(attacker, " on a ", "Tear", TextColor.color(218, 98, 0));
+            case 40 -> killStreakMessage(attacker, " is a ", "Killing Machine", TextColor.color(232, 184, 2));
+            case 50 -> killStreakMessage(attacker, " is ", "Unstoppable", TextColor.color(0, 228, 222));
+            case 60 -> killStreakMessage(attacker, " is ", "Wreaking Havoc", TextColor.color(0, 218, 173));
+            case 70 -> killStreakMessage(attacker, " in a ", "Force of Nature", TextColor.color(0, 246, 145));
+            case 80 -> killStreakMessage(attacker, " is a ", "Juggernaut", TextColor.color(138, 240, 0));
+            case 90 -> killStreakMessage(attacker, " is a ", "Relentless Force", TextColor.color(183, 255, 0));
+            case 100 -> killStreakMessage(attacker, "", "MAY Chaos Take the WORLD!", TextColor.color(255, 198, 0));
+            case 150 -> killStreakMessage(attacker, " in on ", "One Man Army", TextColor.color(140, 0, 255));
+            case 200 -> killStreakMessage(attacker, " is the ", "Chaos Bringer", TextColor.color(232, 0, 255));
+            case 250 -> killStreakMessage(attacker, " is a ", "Doom Bringer", TextColor.color(255, 0, 161));
+            case 300 -> killStreakMessage(attacker, " is one of the", "Four Horsemen of the Apocalypse", TextColor.color(59, 59, 59));
+            case 350 -> killStreakMessage(attacker, " I'm running out of ", "IDEAS", TextColor.color(75, 180, 193));
+            case 450 -> killStreakMessage(attacker, " is ", "Hacking", TextColor.color(118, 64, 123));
+            case 500 -> killStreakMessage(attacker, " is playing ", "Fruit Ninja", TextColor.color(72, 206, 71));
+            case 1000 -> killStreakMessage(attacker, " Needs to go ", "Outside", TextColor.color(0, 108, 4));
+        }
+
+        KillEvent killEvent = new KillEvent(victim, attacker, killCount);
         EventDispatcher.call(killEvent);
 
         Particle particle = Particle.POOF;
@@ -206,7 +246,6 @@ public class OITC extends BaseGame<OITC.Config> {
         player.getInventory().setItemStack(7, arrow.withAmount(amount));
     }
 
-
     public int findCrossbow(Player player) {
         PlayerInventory inventory = player.getInventory();
 
@@ -233,7 +272,6 @@ public class OITC extends BaseGame<OITC.Config> {
         return spawnPositions.get(random.nextInt(0, 4));
     }
 
-
     public void updateSidebar() {
         Set<Map.Entry<UUID, Integer>> killSet = kills.entrySet();
         sidebar.getLines().forEach(line -> sidebar.removeLine(line.getId()));
@@ -246,7 +284,6 @@ public class OITC extends BaseGame<OITC.Config> {
         });
     }
 
-
     public void poof(Particle particle, Player victim, float ExplosionSpeed) {
         Pos playerPos = victim.getPosition();
 
@@ -254,12 +291,16 @@ public class OITC extends BaseGame<OITC.Config> {
         instance.sendGroupedPacket(packet);
     }
 
+    public void killStreakMessage(Player attacker, String middle, String end, TextColor color) {
+        instance.sendMessage(Component.text(attacker.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)
+                .append(Component.text(middle)).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE)
+                .append(Component.text(end).decorate(TextDecoration.BOLD).color(color)));
+    }
 
     @Override
     public List<Feature<?>> features() {
         return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature());
     }
-
 
     public record Config() {
     }
