@@ -2,6 +2,7 @@ package net.mangolise.oitc;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.GameSdkUtils;
@@ -69,10 +70,7 @@ public class ParticleMenu {
             Particle particle = coloredParticle.particle();
             boolean glowing = particle.equals(playerParticle);
 
-            inventory.addItemStack(ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS,
-                    new PotionContents(PotionType.AWKWARD, coloredParticle.color())).withTag(ARROW_PARTICLE, i)
-                    .withCustomName(Component.text(GameSdkUtils.capitaliseFirstLetter(particle.key().value().replace('_', ' ')))
-                            .decoration(TextDecoration.ITALIC, false).color(TextColor.color(coloredParticle.color()))).withGlowing(glowing));
+            inventory.addItemStack(makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, i).withGlowing(glowing));
         }
 
         player.openInventory(inventory);
@@ -91,13 +89,24 @@ public class ParticleMenu {
             player.setTag(OITC.PLAYER_ARROW_COLOR, particle.color());
             player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
             player.closeInventory();
+            updateAmmoDisplay(player, player.getTag(OITC.PLAYERS_AMMO_TAG));
         }
     }
 
     public static void updateAmmoDisplay(Player player, int amount) {
-        ItemStack item = ItemStack.of(Material.TIPPED_ARROW);
+        ItemStack arrow = makeColoredArrow(player.getTag(OITC.PLAYER_ARROW_PARTICLE), player.getTag(OITC.PLAYER_ARROW_COLOR)).withAmount(amount);
 
-        player.getInventory().setItemStack(7, OITC.arrow.withAmount(amount));
+        player.getInventory().setItemStack(7, arrow);
+    }
+
+    private static ItemStack makeColoredArrow(Particle particle, Color color) {
+        return ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, new PotionContents(PotionType.AWKWARD, color))
+                .withCustomName(makeArrowName(particle, color));
+    }
+
+    private static Component makeArrowName(Particle particle, Color color) {
+        return Component.text(GameSdkUtils.capitaliseFirstLetter(particle.key().value().replace('_', ' ')))
+                .decoration(TextDecoration.ITALIC, false).color(TextColor.color(color));
     }
 
     public record ColoredParticle(Color color, Particle particle) {}
