@@ -45,7 +45,7 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
             Player player = e.getPlayer();
 
             if (e.getPlayer().getTag(PLAYER_CAN_DASH)) {
-                context.eventNode().call(new PlayerDashEvent(player));
+                MinecraftServer.getGlobalEventHandler().call(new PlayerDashEvent(player));
                 Vec pos = player.getPosition().direction();
                 player.setVelocity(pos.mul(40, 20, 40));
                 player.setTag(PLAYER_CAN_DASH, false);
