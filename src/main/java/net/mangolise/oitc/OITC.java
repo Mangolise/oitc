@@ -3,12 +3,10 @@ package net.mangolise.oitc;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
-import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
@@ -45,7 +43,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
     public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.CRIT);
-    public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_count").defaultValue(0);
+    public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
 
@@ -144,7 +142,7 @@ public class OITC extends BaseGame<OITC.Config> {
             if (!(e.getTarget() instanceof Player player)) return;
 
             if (arrowEntity.getShooter() instanceof Player shooter) {
-                attacked(player, shooter);
+                attacked(player, shooter, false);
             }
             e.getEntity().remove();
         });
@@ -153,25 +151,23 @@ public class OITC extends BaseGame<OITC.Config> {
             Entity entity = e.getTarget();
 
             if (entity instanceof Player player && e.getEntity() instanceof Player attacker && attacker.getItemInMainHand().material() == Material.IRON_SWORD) {
-                attacked(player, attacker);
+                attacked(player, attacker, true);
             }
         });
     }
 
-    public void attacked(Player victim, Player attacker) {
-        int killCount = kills.get(attacker.getUuid()) + 1;
-
-        victim.setTag(PLAYER_KILL_STREAK, 0);
-        attacker.setTag(PLAYER_KILL_STREAK, attacker.getTag(PLAYER_KILL_STREAK) + 1);
-
+    public void attacked(Player victim, Player attacker, boolean fromSword) {
         if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
                 victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
-        instance.sendMessage(ChatUtil.getDisplayName(victim).decorate(TextDecoration.BOLD)
-                .append(Component.text(" was Killed by ").decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
-                .append(ChatUtil.getDisplayName(attacker)).decorate(TextDecoration.BOLD));
+        int killCount = kills.get(attacker.getUuid()) + 1;
+
+        victim.setTag(PLAYER_KILL_STREAK, 0);
+        attacker.updateTag(PLAYER_KILL_STREAK, streak -> streak + 1);
+
+        KillMessages.sendDeathMessage(instance, victim, attacker, fromSword);
 
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
@@ -190,29 +186,7 @@ public class OITC extends BaseGame<OITC.Config> {
         updateSidebar();
 
         int killStreak = attacker.getTag(PLAYER_KILL_STREAK);
-
-        switch (killStreak) {
-            case 5 -> killStreakMessage(attacker, " is on ", "Fire", TextColor.color(255, 165, 43));
-            case 10 -> killStreakMessage(attacker, " is ", "Killing it", TextColor.color(163, 33, 0));
-            case 15 -> killStreakMessage(attacker, " is ", "Dominating", TextColor.color(92, 0, 2));
-            case 20 -> killStreakMessage(attacker, " is on a ", "Rampage", TextColor.color(255, 55, 30));
-            case 30 -> killStreakMessage(attacker, " on a ", "Tear", TextColor.color(218, 98, 0));
-            case 40 -> killStreakMessage(attacker, " is a ", "Killing Machine", TextColor.color(232, 184, 2));
-            case 50 -> killStreakMessage(attacker, " is ", "Unstoppable", TextColor.color(0, 228, 222));
-            case 60 -> killStreakMessage(attacker, " is ", "Wreaking Havoc", TextColor.color(0, 218, 173));
-            case 70 -> killStreakMessage(attacker, " in a ", "Force of Nature", TextColor.color(0, 246, 145));
-            case 80 -> killStreakMessage(attacker, " is a ", "Juggernaut", TextColor.color(138, 240, 0));
-            case 90 -> killStreakMessage(attacker, " is a ", "Relentless Force", TextColor.color(183, 255, 0));
-            case 100 -> killStreakMessage(attacker, "", "MAY Chaos Take the WORLD!", TextColor.color(255, 198, 0));
-            case 150 -> killStreakMessage(attacker, " in on ", "One Man Army", TextColor.color(140, 0, 255));
-            case 200 -> killStreakMessage(attacker, " is the ", "Chaos Bringer", TextColor.color(232, 0, 255));
-            case 250 -> killStreakMessage(attacker, " is a ", "Doom Bringer", TextColor.color(255, 0, 161));
-            case 300 -> killStreakMessage(attacker, " is one of the", "Four Horsemen of the Apocalypse", TextColor.color(59, 59, 59));
-            case 350 -> killStreakMessage(attacker, " I'm running out of ", "IDEAS", TextColor.color(75, 180, 193));
-            case 450 -> killStreakMessage(attacker, " is ", "Hacking", TextColor.color(118, 64, 123));
-            case 500 -> killStreakMessage(attacker, " is playing ", "Fruit Ninja", TextColor.color(72, 206, 71));
-            case 1000 -> killStreakMessage(attacker, " Needs to go ", "Outside", TextColor.color(0, 108, 4));
-        }
+        KillMessages.sendKillStreakMessage(killStreak, attacker, instance);
 
         KillEvent killEvent = new KillEvent(victim, attacker, killCount);
         EventDispatcher.call(killEvent);
@@ -290,12 +264,6 @@ public class OITC extends BaseGame<OITC.Config> {
 
         ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, 30);
         instance.sendGroupedPacket(packet);
-    }
-
-    public void killStreakMessage(Player attacker, String middle, String end, TextColor color) {
-        instance.sendMessage(ChatUtil.getDisplayName(attacker).decorate(TextDecoration.BOLD)
-                .append(Component.text(middle).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
-                .append(Component.text(end).decorate(TextDecoration.BOLD).color(color)));
     }
 
     @Override
