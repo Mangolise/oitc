@@ -49,7 +49,7 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
                 Vec pos = player.getPosition().direction();
                 player.setVelocity(pos.mul(40, 20, 40));
                 player.setTag(PLAYER_CAN_DASH, false);
-                instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_JUMP, Sound.Source.PLAYER, 1f, 1f), player.getPosition());
+                instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_JUMP, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
                 playerDashParticle(player, instance);
 

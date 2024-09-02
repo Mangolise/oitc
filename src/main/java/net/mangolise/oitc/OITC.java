@@ -149,7 +149,7 @@ public class OITC extends BaseGame<OITC.Config> {
             arrow.setInstance(instance, spawnPosition);
             arrow.setVelocity(player.getPosition().direction().mul(75));
 
-            instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 2f, 1f), player.getPosition());
+            instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
             setAmmo(player, player.getTag(PLAYERS_AMMO_TAG) - 1);
         });
