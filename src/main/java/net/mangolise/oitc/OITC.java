@@ -3,6 +3,7 @@ package net.mangolise.oitc;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
@@ -10,6 +11,7 @@ import net.mangolise.gamesdk.features.NoCollisionFeature;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
@@ -33,7 +35,6 @@ import net.minestom.server.tag.Tag;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class OITC extends BaseGame<OITC.Config> {
 
@@ -41,21 +42,22 @@ public class OITC extends BaseGame<OITC.Config> {
         super(config);
     }
 
-    static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
-    public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(Particle.CRIT);
+    public static final Tag<Integer> PLAYERS_AMMO_TAG = Tag.Integer("player_ammo").defaultValue(1);
+    public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(ParticleMenu.particles.getFirst().particle());
+    public static final Tag<Color> PLAYER_ARROW_COLOR = Tag.<Color>Transient("player_arrow_color").defaultValue(ParticleMenu.particles.getFirst().color());
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
+    public static final Tag<Boolean> PARTICLE_MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
+    public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
+
+    public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
+            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
+    public static final ItemStack arrow = ItemStack.of(Material.ARROW)
+            .withCustomName(Component.text("Arrow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
+    public static final ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow))
+            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
-
-    ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
-            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
-    ItemStack arrow = ItemStack.of(Material.ARROW)
-            .withCustomName(Component.text("Arrow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
-    ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow))
-            .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
     Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
-
-    Sidebar sidebar = new Sidebar(Component.text("Scoreboard"));
     Map<UUID, Integer> kills = new HashMap<>();
 
     @Override
@@ -78,6 +80,15 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, e -> {
             Player player = e.getPlayer();
 
+            kills.put(player.getUuid(), 0);
+
+            Sidebar sidebar = new Sidebar(Component.text("One in the Chamber").decorate(TextDecoration.BOLD).color(TextColor.color(255, 172, 0)));
+            sidebar.addViewer(player);
+            player.setTag(PLAYER_SIDEBAR, sidebar);
+            for (Player player1 : instance.getPlayers()) {
+                ScoreboardFeature.updateSidebar(player1, instance, kills);
+            }
+
             player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1000);
 
             player.setRespawnPoint(GameSdkUtils.getSpawnPosition(instance));
@@ -90,15 +101,21 @@ public class OITC extends BaseGame<OITC.Config> {
                     .withCustomName(Component.text("Particle Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
             setAmmo(e.getPlayer(), 1);
-            sidebar.addViewer(player);
-            kills.put(player.getUuid(), 0);
-            updateSidebar();
         });
 
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> kills.remove(e.getPlayer().getUuid()));
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> {
+            kills.remove(e.getPlayer().getUuid());
+            for (Player player1 : instance.getPlayers()) {
+                ScoreboardFeature.updateSidebar(player1, instance, kills);
+            }
+        });
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
+            if (e.getInventory() != null && e.getInventory().getTag(PARTICLE_MENU_IS_OPEN)) {
+                e.setCancelled(true);
+            }
+
             if (e.getClickedItem().material().equals(Material.CHEST)) {
                 ParticleMenu.openMenu(e.getPlayer());
                 e.setCancelled(true);
@@ -157,18 +174,18 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     public void attacked(Player victim, Player attacker, boolean fromSword) {
+        // player spawn is above y level 22
         if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
                 victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
         int killCount = kills.get(attacker.getUuid()) + 1;
-
         victim.setTag(PLAYER_KILL_STREAK, 0);
         attacker.updateTag(PLAYER_KILL_STREAK, streak -> streak + 1);
 
+        // instead of killing player, this fakes players death by teleporting them.
         KillMessages.sendDeathMessage(instance, victim, attacker, fromSword);
-
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
@@ -183,7 +200,10 @@ public class OITC extends BaseGame<OITC.Config> {
         setAmmo(victim, 1);
 
         kills.put(attacker.getUuid(), killCount);
-        updateSidebar();
+
+        for (Player player : instance.getPlayers()) {
+            ScoreboardFeature.updateSidebar(player, instance, kills);
+        }
 
         int killStreak = attacker.getTag(PLAYER_KILL_STREAK);
         KillMessages.sendKillStreakMessage(killStreak, attacker, instance);
@@ -198,6 +218,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public void setAmmo(Player player, int amount) {
         player.setTag(PLAYERS_AMMO_TAG, amount);
 
+        // cancels a timer if the player gets a kill.
         if (arrowCountdown.containsKey(player.getUuid())) {
             CompletableFuture<Void> timer = arrowCountdown.get(player.getUuid());
             timer.complete(null);
@@ -218,7 +239,7 @@ public class OITC extends BaseGame<OITC.Config> {
             player.getInventory().setItemStack(findCrossbow(player), chargedCrossbow);
         }
 
-        player.getInventory().setItemStack(7, arrow.withAmount(amount));
+        ParticleMenu.updateAmmoDisplay(player, amount);
     }
 
     public int findCrossbow(Player player) {
@@ -233,7 +254,6 @@ public class OITC extends BaseGame<OITC.Config> {
         return  -1;
     }
 
-
     public Pos randomSpawn() {
         Random random = new Random();
 
@@ -247,18 +267,6 @@ public class OITC extends BaseGame<OITC.Config> {
         return spawnPositions.get(random.nextInt(0, 4));
     }
 
-    public void updateSidebar() {
-        Set<Map.Entry<UUID, Integer>> killSet = kills.entrySet();
-        sidebar.getLines().forEach(line -> sidebar.removeLine(line.getId()));
-        AtomicInteger i = new AtomicInteger();
-        killSet.stream().sorted(Comparator.comparingInt(Map.Entry::getValue)).limit(12).forEach(entry -> {
-            Player player = instance.getPlayerByUuid(entry.getKey());
-            assert player != null;
-            sidebar.createLine(new Sidebar.ScoreboardLine(i.toString(), Component.text(player.getUsername() + ": " + entry.getValue()), i.get()));
-            i.getAndIncrement();
-        });
-    }
-
     public void poof(Particle particle, Player victim, float ExplosionSpeed) {
         Pos playerPos = victim.getPosition();
 
@@ -268,7 +276,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature());
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature(), new ScoreboardFeature());
     }
 
     public record Config() {

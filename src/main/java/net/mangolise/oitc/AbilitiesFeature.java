@@ -3,6 +3,7 @@ package net.mangolise.oitc;
 import net.kyori.adventure.sound.Sound;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.Timer;
+import net.mangolise.oitc.events.PlayerDashEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -44,6 +45,7 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
             Player player = e.getPlayer();
 
             if (e.getPlayer().getTag(PLAYER_CAN_DASH)) {
+                context.eventNode().call(new PlayerDashEvent(player));
                 Vec pos = player.getPosition().direction();
                 player.setVelocity(pos.mul(40, 20, 40));
                 player.setTag(PLAYER_CAN_DASH, false);

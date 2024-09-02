@@ -1,6 +1,8 @@
 package net.mangolise.oitc;
 
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.color.Color;
@@ -14,14 +16,15 @@ import net.minestom.server.item.Material;
 import net.minestom.server.item.component.PotionContents;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.PotionType;
+import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
 import java.util.List;
 
 public class ParticleMenu {
     private static final Tag<Integer> ARROW_PARTICLE = Tag.Integer("arrow_particle");
-    private static final List<ColoredParticle> particles = List.of(
-            new ColoredParticle(new Color(240, 197, 67), Particle.TOTEM_OF_UNDYING),
+    public static final List<ColoredParticle> particles = List.of(
+            new ColoredParticle(new Color(250, 236, 217), Particle.CRIT),
             new ColoredParticle(new Color(222, 91, 209), Particle.WITCH),
             new ColoredParticle(new Color(242, 153, 233), Particle.CHERRY_LEAVES),
             new ColoredParticle(new Color(35, 125, 41), Particle.SPORE_BLOSSOM_AIR),
@@ -53,19 +56,23 @@ public class ParticleMenu {
             new ColoredParticle(new Color(148, 4, 196), Particle.REVERSE_PORTAL),
             new ColoredParticle(new Color(232, 156, 56), Particle.SMALL_FLAME),
             new ColoredParticle(new Color(199, 193, 185), Particle.SMALL_GUST),
-            new ColoredParticle(new Color(250, 236, 217), Particle.CRIT)
+            new ColoredParticle(new Color(240, 197, 67), Particle.TOTEM_OF_UNDYING)
     );
 
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_4_ROW, "Particle Menu");
+        inventory.setTag(OITC.PARTICLE_MENU_IS_OPEN, true);
+        Particle playerParticle = player.getTag(OITC.PLAYER_ARROW_PARTICLE);
 
         for (int i = 0; i < particles.size(); i++) {
             ColoredParticle coloredParticle = particles.get(i);
             Particle particle = coloredParticle.particle();
+            boolean glowing = particle.equals(playerParticle);
 
             inventory.addItemStack(ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS,
                     new PotionContents(PotionType.AWKWARD, coloredParticle.color())).withTag(ARROW_PARTICLE, i)
-                    .withCustomName(Component.text(GameSdkUtils.capitaliseFirstLetter(particle.key().value().replace('_', ' '))).decoration(TextDecoration.ITALIC, false)));
+                    .withCustomName(Component.text(GameSdkUtils.capitaliseFirstLetter(particle.key().value().replace('_', ' ')))
+                            .decoration(TextDecoration.ITALIC, false).color(TextColor.color(coloredParticle.color()))).withGlowing(glowing));
         }
 
         player.openInventory(inventory);
@@ -75,12 +82,23 @@ public class ParticleMenu {
         ItemStack clickedItem = e.getClickedItem();
 
         if (clickedItem.material().equals(Material.TIPPED_ARROW)) {
-            Particle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE)).particle();
-            e.getPlayer().setTag(OITC.PLAYER_ARROW_PARTICLE, particle);
             e.setCancelled(true);
-            e.getPlayer().closeInventory();
+
+            Player player = e.getPlayer();
+            ColoredParticle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE));
+
+            player.setTag(OITC.PLAYER_ARROW_PARTICLE, particle.particle());
+            player.setTag(OITC.PLAYER_ARROW_COLOR, particle.color());
+            player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
+            player.closeInventory();
         }
     }
 
-    private record ColoredParticle(Color color, Particle particle) {}
+    public static void updateAmmoDisplay(Player player, int amount) {
+        ItemStack item = ItemStack.of(Material.TIPPED_ARROW);
+
+        player.getInventory().setItemStack(7, OITC.arrow.withAmount(amount));
+    }
+
+    public record ColoredParticle(Color color, Particle particle) {}
 }
