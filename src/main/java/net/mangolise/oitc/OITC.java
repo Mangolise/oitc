@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.minestom.server.MinecraftServer;
@@ -168,9 +169,9 @@ public class OITC extends BaseGame<OITC.Config> {
             return;
         }
 
-        instance.sendMessage(Component.text(victim.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)
+        instance.sendMessage(ChatUtil.getDisplayName(victim).decorate(TextDecoration.BOLD)
                 .append(Component.text(" was Killed by ").decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
-                .append(Component.text(attacker.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)));
+                .append(ChatUtil.getDisplayName(attacker)).decorate(TextDecoration.BOLD));
 
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
@@ -292,8 +293,8 @@ public class OITC extends BaseGame<OITC.Config> {
     }
 
     public void killStreakMessage(Player attacker, String middle, String end, TextColor color) {
-        instance.sendMessage(Component.text(attacker.getUsername()).decorate(TextDecoration.BOLD).color(NamedTextColor.GRAY)
-                .append(Component.text(middle)).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE)
+        instance.sendMessage(ChatUtil.getDisplayName(attacker).decorate(TextDecoration.BOLD)
+                .append(Component.text(middle).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
                 .append(Component.text(end).decorate(TextDecoration.BOLD).color(color)));
     }
 

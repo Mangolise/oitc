@@ -1,5 +1,7 @@
 package net.mangolise.oitc;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
@@ -12,6 +14,10 @@ public class Test {
 
         MinecraftServer server = MinecraftServer.init();
         MinecraftServer.getConnectionManager().setUuidProvider((connection, username) -> GameSdkUtils.createFakeUUID(username));
+
+        // Simulate a player without a rank (gray name)
+        MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e ->
+                e.getPlayer().setDisplayName(Component.text(e.getPlayer().getUsername()).color(NamedTextColor.GRAY)));
 
         OITC.Config config = new OITC.Config();
         OITC game = new OITC(config);
