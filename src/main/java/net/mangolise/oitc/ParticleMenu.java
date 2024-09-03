@@ -73,6 +73,7 @@ public class ParticleMenu {
             inventory.addItemStack(makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, i).withGlowing(glowing));
         }
 
+        player.playSound(Sound.sound(SoundEvent.BLOCK_CHEST_OPEN, Sound.Source.PLAYER, 0.5f, 1f));
         player.openInventory(inventory);
     }
 

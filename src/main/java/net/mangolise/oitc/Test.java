@@ -19,7 +19,7 @@ public class Test {
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e ->
                 e.getPlayer().setDisplayName(Component.text(e.getPlayer().getUsername()).color(NamedTextColor.GRAY)));
 
-        OITC.Config config = new OITC.Config();
+        OITC.Config config = new OITC.Config("mc.mangolise.net");
         OITC game = new OITC(config);
         game.setup();
 

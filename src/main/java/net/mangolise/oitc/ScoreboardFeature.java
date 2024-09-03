@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class ScoreboardFeature implements Game.Feature<OITC> {
+    private static String ip;
+
     public static void updateSidebar(Player player, Instance instance, Map<UUID, Integer> kills) {
         Set<Map.Entry<UUID, Integer>> killSet = kills.entrySet();
         SidebarBuilder sidebarBuilder = new SidebarBuilder();
@@ -36,13 +38,13 @@ public class ScoreboardFeature implements Game.Feature<OITC> {
         });
 
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
-        sidebarBuilder.addLine(Component.text("mc.mangolise.net").color(NamedTextColor.GOLD));
+        sidebarBuilder.addLine(Component.text(ip).color(NamedTextColor.GOLD));
 
         sidebarBuilder.apply(sidebar);
     }
 
     @Override
     public void setup(Context<OITC> context) {
-
+        ip = context.game().config().serverIp();
     }
 }

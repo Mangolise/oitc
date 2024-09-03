@@ -47,6 +47,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Color> PLAYER_ARROW_COLOR = Tag.<Color>Transient("player_arrow_color").defaultValue(ParticleMenu.particles.getFirst().color());
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
     public static final Tag<Boolean> PARTICLE_MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
+    public static final Tag<Boolean> OITC_MENU_IS_OPEN = Tag.Boolean("oitc_menu_is_open").defaultValue(false);
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
@@ -56,8 +57,9 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow))
             .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
 
+    public static Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
+
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
-    Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
     Map<UUID, Integer> kills = new HashMap<>();
 
     @Override
@@ -97,10 +99,10 @@ public class OITC extends BaseGame<OITC.Config> {
             player.getInventory().addItemStack(chargedCrossbow);
             player.getInventory().addItemStack(ItemStack.of(Material.IRON_SWORD)
                     .withCustomName(Component.text("Iron Sword").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY)));
-            player.getInventory().setItemStack(8, ItemStack.of(Material.CHEST)
-                    .withCustomName(Component.text("Particle Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
+            player.getInventory().setItemStack(8, ItemStack.of(Material.COMPASS)
+                    .withCustomName(Component.text("OITC Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
-            setAmmo(e.getPlayer(), 1);
+            AttackedFeature.setAmmo(e.getPlayer(), 1);
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> {
@@ -122,6 +124,12 @@ public class OITC extends BaseGame<OITC.Config> {
                 return;
             }
 
+            if (e.getClickedItem().material().equals(Material.COMPASS)) {
+                OitcMenu.openMenu(e.getPlayer());
+                e.setCancelled(true);
+                return;
+            }
+
             if (e.getClickedItem().material().equals(Material.ARROW)) {
                 e.setCancelled(true);
             }
@@ -133,8 +141,8 @@ public class OITC extends BaseGame<OITC.Config> {
             Player player = e.getPlayer();
             ItemStack heldItem = e.getItemStack();
 
-            if (heldItem.material().equals(Material.CHEST)) {
-                ParticleMenu.openMenu(player);
+            if (heldItem.material().equals(Material.COMPASS)) {
+                OitcMenu.openMenu(player);
                 e.setCancelled(true);
                 return;
             }
@@ -151,7 +159,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
             instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
-            setAmmo(player, player.getTag(PLAYERS_AMMO_TAG) - 1);
+            AttackedFeature.setAmmo(player, player.getTag(PLAYERS_AMMO_TAG) - 1);
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(ProjectileCollideWithEntityEvent.class, e -> {
@@ -159,7 +167,7 @@ public class OITC extends BaseGame<OITC.Config> {
             if (!(e.getTarget() instanceof Player player)) return;
 
             if (arrowEntity.getShooter() instanceof Player shooter) {
-                attacked(player, shooter, false);
+                AttackedFeature.attacked(player, shooter, false, instance, kills);
             }
             e.getEntity().remove();
         });
@@ -168,93 +176,12 @@ public class OITC extends BaseGame<OITC.Config> {
             Entity entity = e.getTarget();
 
             if (entity instanceof Player player && e.getEntity() instanceof Player attacker && attacker.getItemInMainHand().material() == Material.IRON_SWORD) {
-                attacked(player, attacker, true);
+                AttackedFeature.attacked(player, attacker, true, instance, kills);
             }
         });
     }
 
-    public void attacked(Player victim, Player attacker, boolean fromSword) {
-        // player spawn is above y level 22
-        if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
-                victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
-            return;
-        }
-
-        int killCount = kills.get(attacker.getUuid()) + 1;
-        victim.setTag(PLAYER_KILL_STREAK, 0);
-        attacker.updateTag(PLAYER_KILL_STREAK, streak -> streak + 1);
-
-        // instead of killing player, this fakes players death by teleporting them.
-        KillMessages.sendDeathMessage(instance, victim, attacker, fromSword);
-        victim.setGameMode(GameMode.SPECTATOR);
-        victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
-
-        Timer.countDownForPlayer(3, victim).thenRun(() -> {
-            victim.setGameMode(GameMode.ADVENTURE);
-            victim.teleport(randomSpawn());
-        });
-
-        attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
-        setAmmo(attacker, attacker.getTag(PLAYERS_AMMO_TAG) + 1);
-
-        setAmmo(victim, 1);
-
-        kills.put(attacker.getUuid(), killCount);
-
-        for (Player player : instance.getPlayers()) {
-            ScoreboardFeature.updateSidebar(player, instance, kills);
-        }
-
-        int killStreak = attacker.getTag(PLAYER_KILL_STREAK);
-        KillMessages.sendKillStreakMessage(killStreak, attacker, instance);
-
-        KillEvent killEvent = new KillEvent(victim, attacker, killCount);
-        EventDispatcher.call(killEvent);
-
-        Particle particle = Particle.POOF;
-        poof(particle, victim, 0.1f);
-    }
-
-    public void setAmmo(Player player, int amount) {
-        player.setTag(PLAYERS_AMMO_TAG, amount);
-
-        // cancels a timer if the player gets a kill.
-        if (arrowCountdown.containsKey(player.getUuid())) {
-            CompletableFuture<Void> timer = arrowCountdown.get(player.getUuid());
-            timer.complete(null);
-            player.sendActionBar(Component.text());
-        }
-
-        if (amount <= 0) {
-            CompletableFuture<Void> timer = Timer.countDown(10, i -> {
-                player.sendActionBar(Component.text(i).color(NamedTextColor.GOLD).decorate(TextDecoration.BOLD));
-            });
-            timer.thenRun(() -> {
-                setAmmo(player, amount + 1);
-                player.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_QUICK_CHARGE_3, Sound.Source.PLAYER, 1f, 2f));
-            });
-            arrowCountdown.put(player.getUuid(), timer);
-            player.getInventory().setItemStack(findCrossbow(player), crossbow);
-        } else {
-            player.getInventory().setItemStack(findCrossbow(player), chargedCrossbow);
-        }
-
-        ParticleMenu.updateAmmoDisplay(player, amount);
-    }
-
-    public int findCrossbow(Player player) {
-        PlayerInventory inventory = player.getInventory();
-
-        for (int i = 0; i < inventory.getSize(); i++) {
-            if (inventory.getItemStack(i).material() == Material.CROSSBOW) {
-                return i;
-            }
-        }
-
-        return  -1;
-    }
-
-    public Pos randomSpawn() {
+    public static Pos randomSpawn() {
         Random random = new Random();
 
         List<Pos> spawnPositions = List.of(
@@ -267,18 +194,11 @@ public class OITC extends BaseGame<OITC.Config> {
         return spawnPositions.get(random.nextInt(0, 4));
     }
 
-    public void poof(Particle particle, Player victim, float ExplosionSpeed) {
-        Pos playerPos = victim.getPosition();
-
-        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, 30);
-        instance.sendGroupedPacket(packet);
-    }
-
     @Override
     public List<Feature<?>> features() {
-        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature(), new ScoreboardFeature());
+        return List.of(new AdminCommandsFeature(), new NoCollisionFeature(), new AbilitiesFeature(), new ScoreboardFeature(), new AttackedFeature());
     }
 
-    public record Config() {
+    public record Config(String serverIp) {
     }
 }
