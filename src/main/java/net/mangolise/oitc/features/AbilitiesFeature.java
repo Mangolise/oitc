@@ -1,8 +1,10 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.features;
 
 import net.kyori.adventure.sound.Sound;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.Timer;
+import net.mangolise.oitc.OITC;
+import net.mangolise.oitc.events.KillEvent;
 import net.mangolise.oitc.events.PlayerDashEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;

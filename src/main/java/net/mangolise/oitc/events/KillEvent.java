@@ -1,4 +1,4 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.events;
 
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.trait.PlayerEvent;

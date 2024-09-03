@@ -1,4 +1,4 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.features;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.SidebarBuilder;
+import net.mangolise.oitc.OITC;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.scoreboard.Sidebar;

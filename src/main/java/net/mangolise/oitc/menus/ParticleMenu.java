@@ -1,11 +1,11 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.menus;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.GameSdkUtils;
+import net.mangolise.oitc.OITC;
 import net.minestom.server.color.Color;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;

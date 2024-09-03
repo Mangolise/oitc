@@ -1,4 +1,4 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.features;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -6,6 +6,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.Timer;
+import net.mangolise.oitc.KillMessages;
+import net.mangolise.oitc.OITC;
+import net.mangolise.oitc.menus.ParticleMenu;
+import net.mangolise.oitc.events.KillEvent;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;

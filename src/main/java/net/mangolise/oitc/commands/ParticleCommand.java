@@ -1,4 +1,4 @@
-package net.mangolise.oitc;
+package net.mangolise.oitc.commands;
 
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;

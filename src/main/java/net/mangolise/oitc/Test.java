@@ -8,6 +8,8 @@ import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
 import net.minestom.server.extras.bungee.BungeeCordProxy;
 import net.minestom.server.permission.Permission;
 
+import java.util.Objects;
+
 // This is a dev server, not used in production
 public class Test {
     public static void main(String[] args) {
@@ -19,7 +21,7 @@ public class Test {
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e ->
                 e.getPlayer().setDisplayName(Component.text(e.getPlayer().getUsername()).color(NamedTextColor.GRAY)));
 
-        OITC.Config config = new OITC.Config("mc.mangolise.net");
+        OITC.Config config = new OITC.Config(Objects.requireNonNullElse(System.getenv("SERVER_IP"), "mc.mangolise.net"));
         OITC game = new OITC(config);
         game.setup();
 

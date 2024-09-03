@@ -9,24 +9,27 @@ import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
 import net.mangolise.gamesdk.util.GameSdkUtils;
-import net.mangolise.gamesdk.util.Timer;
+import net.mangolise.oitc.commands.ParticleCommand;
+import net.mangolise.oitc.features.AbilitiesFeature;
+import net.mangolise.oitc.features.AttackedFeature;
+import net.mangolise.oitc.features.ScoreboardFeature;
+import net.mangolise.oitc.menus.OitcMenu;
+import net.mangolise.oitc.menus.ParticleMenu;
+import net.mangolise.oitc.menus.SpawnMenu;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.sound.SoundEvent;
@@ -48,6 +51,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
     public static final Tag<Boolean> PARTICLE_MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
     public static final Tag<Boolean> OITC_MENU_IS_OPEN = Tag.Boolean("oitc_menu_is_open").defaultValue(false);
+    public static final Tag<Boolean> SPAWN_POINT_MENU_IS_OPEN = Tag.Boolean("oitc_menu_is_open").defaultValue(false);
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
@@ -122,19 +126,20 @@ public class OITC extends BaseGame<OITC.Config> {
                 ParticleMenu.openMenu(e.getPlayer());
                 e.setCancelled(true);
                 return;
-            }
-
-            if (e.getClickedItem().material().equals(Material.COMPASS)) {
+            } else if (e.getClickedItem().material().equals(Material.COMPASS)) {
                 OitcMenu.openMenu(e.getPlayer());
                 e.setCancelled(true);
                 return;
-            }
-
-            if (e.getClickedItem().material().equals(Material.ARROW)) {
+            } else if (e.getClickedItem().material().equals(Material.ENDER_CHEST) && e.getPlayer().getPosition().y() > 22.0) {
+                SpawnMenu.openMenu(e.getPlayer());
+                e.setCancelled(true);
+                return;
+            } else if (e.getClickedItem().material().equals(Material.ARROW)) {
                 e.setCancelled(true);
             }
 
             ParticleMenu.handlePreClickEvent(e);
+            SpawnMenu.handlePreClickEvent(e, e.getPlayer());
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, e -> {
