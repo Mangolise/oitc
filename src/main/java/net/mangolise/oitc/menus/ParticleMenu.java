@@ -62,7 +62,7 @@ public class ParticleMenu {
 
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_4_ROW, "Particle Menu");
-        inventory.setTag(OITC.PARTICLE_MENU_IS_OPEN, true);
+        inventory.setTag(OITC.MENU_IS_OPEN, true);
         Particle playerParticle = player.getTag(OITC.PLAYER_ARROW_PARTICLE);
 
         for (int i = 0; i < particles.size(); i++) {

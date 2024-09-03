@@ -49,9 +49,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(ParticleMenu.particles.getFirst().particle());
     public static final Tag<Color> PLAYER_ARROW_COLOR = Tag.<Color>Transient("player_arrow_color").defaultValue(ParticleMenu.particles.getFirst().color());
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
-    public static final Tag<Boolean> PARTICLE_MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
-    public static final Tag<Boolean> OITC_MENU_IS_OPEN = Tag.Boolean("oitc_menu_is_open").defaultValue(false);
-    public static final Tag<Boolean> SPAWN_POINT_MENU_IS_OPEN = Tag.Boolean("oitc_menu_is_open").defaultValue(false);
+    public static final Tag<Boolean> MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
@@ -118,7 +116,7 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
-            if (e.getInventory() != null && e.getInventory().getTag(PARTICLE_MENU_IS_OPEN)) {
+            if (e.getInventory() != null && e.getInventory().getTag(MENU_IS_OPEN)) {
                 e.setCancelled(true);
             }
 
