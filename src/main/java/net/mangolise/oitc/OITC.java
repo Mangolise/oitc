@@ -13,9 +13,7 @@ import net.mangolise.oitc.commands.ParticleCommand;
 import net.mangolise.oitc.features.AbilitiesFeature;
 import net.mangolise.oitc.features.AttackedFeature;
 import net.mangolise.oitc.features.ScoreboardFeature;
-import net.mangolise.oitc.menus.OitcMenu;
-import net.mangolise.oitc.menus.ParticleMenu;
-import net.mangolise.oitc.menus.SpawnMenu;
+import net.mangolise.oitc.menus.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
@@ -132,7 +130,15 @@ public class OITC extends BaseGame<OITC.Config> {
                 SpawnMenu.openMenu(e.getPlayer());
                 e.setCancelled(true);
                 return;
-            } else if (e.getClickedItem().material().equals(Material.ARROW)) {
+            } else if (e.getClickedItem().material().equals(Material.ECHO_SHARD) && e.getPlayer().getPosition().y() > 22.0) {
+                AbilitiesMenu.openMenu(e.getPlayer());
+                e.setCancelled(true);
+                return;
+            } else if (e.getClickedItem().material().equals(Material.NETHER_STAR)) {
+                LeaveMenu.openMenu(e.getPlayer());
+                e.setCancelled(true);
+                return;
+            } else if (e.getClickedItem().material().equals(Material.TIPPED_ARROW)) {
                 e.setCancelled(true);
             }
 

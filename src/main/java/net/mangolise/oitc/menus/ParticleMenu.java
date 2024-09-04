@@ -80,7 +80,7 @@ public class ParticleMenu {
     public static void handlePreClickEvent(InventoryPreClickEvent e) {
         ItemStack clickedItem = e.getClickedItem();
 
-        if (clickedItem.material().equals(Material.TIPPED_ARROW)) {
+        if (clickedItem.material().equals(Material.TIPPED_ARROW) && clickedItem.hasTag(ARROW_PARTICLE)) {
             e.setCancelled(true);
 
             Player player = e.getPlayer();

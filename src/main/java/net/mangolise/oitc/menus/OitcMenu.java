@@ -18,6 +18,12 @@ public class OitcMenu {
         inventory.setItemStack(10, ItemStack.of(Material.CHEST)
                 .withCustomName(Component.text("Particle Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
+        inventory.setItemStack(14, ItemStack.of(Material.ECHO_SHARD)
+                .withCustomName(Component.text("Abilities Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
+
+        inventory.setItemStack(16, ItemStack.of(Material.NETHER_STAR)
+                .withCustomName(Component.text("Leave Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
+
         if (player.getPosition().y() < 22.0) {
             inventory.setItemStack(12, ItemStack.of(Material.BARRIER)
                     .withCustomName(Component.text("Spawn Point Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
