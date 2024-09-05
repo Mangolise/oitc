@@ -29,7 +29,7 @@ public class AbilitiesMenu {
         inventory.setItemStack(6, ItemStack.of(Material.ENDER_PEARL)
                 .withCustomName(Component.text("Teleport").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_PURPLE)));
 
-        player.playSound(Sound.sound(SoundEvent.BLOCK_SCULK_SHRIEKER_HIT, Sound.Source.PLAYER, 1f, 1f));
+        player.playSound(Sound.sound(SoundEvent.BLOCK_ENCHANTMENT_TABLE_USE, Sound.Source.PLAYER, 1f, 1f));
         player.openInventory(inventory);
     }
 

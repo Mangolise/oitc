@@ -31,19 +31,19 @@ public class PlayerSpeedAbility {
             }
 
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player));
-            player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.2);
+            player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.18);
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
             instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_WIND_BURST, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
             // 8 * 20 is converting the timer from seconds into ticks.
-            CompletableFuture<Void> sprintDuration = Timer.countDown(8 * 20, 1, i -> spawnParticle(i, player, instance));
+            CompletableFuture<Void> sprintDuration = Timer.countDown(6 * 20, 1, i -> spawnParticle(i, player, instance));
 
             sprintDuration.thenRun(() -> {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_ILLUSIONER_CAST_SPELL, Sound.Source.PLAYER, 1f, 1f));
-                CompletableFuture<Void> timer = Timer.countDown(8, i -> {
+                CompletableFuture<Void> timer = Timer.countDown(10, i -> {
                     player.setLevel(i);
-                    player.setExp(1 - ((float) i / 8f));
+                    player.setExp(1 - ((float) i / 10f));
                 });
                 timer.thenRun(() -> {
                     player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, true);

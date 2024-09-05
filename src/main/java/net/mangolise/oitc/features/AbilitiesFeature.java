@@ -5,6 +5,7 @@ import net.mangolise.oitc.OITC;
 import net.mangolise.oitc.abilities.AbilityType;
 import net.mangolise.oitc.abilities.PlayerDashAbility;
 import net.mangolise.oitc.abilities.PlayerSpeedAbility;
+import net.mangolise.oitc.abilities.PlayerTeleportAbility;
 import net.mangolise.oitc.events.KillEvent;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.attribute.Attribute;
@@ -38,7 +39,7 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
             switch (e.getPlayer().getTag(PLAYER_SELECTED_ABILITY)) {
                 case DASH -> PlayerDashAbility.playerDashAbility(e);
                 case SPEED -> PlayerSpeedAbility.playerSpeedAbility(e);
-                case TELEPORT -> {}
+                case TELEPORT -> PlayerTeleportAbility.playerTeleportAbility(e);
             }
         });
     }
