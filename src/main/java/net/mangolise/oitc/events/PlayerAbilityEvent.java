@@ -3,10 +3,10 @@ package net.mangolise.oitc.events;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
 
-public class PlayerDashEvent implements Event {
+public class PlayerAbilityEvent implements Event {
     private final Player player;
 
-    public PlayerDashEvent(Player player) {
+    public PlayerAbilityEvent(Player player) {
         this.player = player;
     }
 

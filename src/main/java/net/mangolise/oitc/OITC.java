@@ -144,6 +144,7 @@ public class OITC extends BaseGame<OITC.Config> {
 
             ParticleMenu.handlePreClickEvent(e);
             SpawnMenu.handlePreClickEvent(e, e.getPlayer());
+            AbilitiesMenu.handlePreClickEvent(e, e.getPlayer());
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, e -> {

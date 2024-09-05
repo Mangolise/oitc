@@ -28,7 +28,7 @@ public class SpawnMenu {
         inventory.setItemStack(5, ItemStack.of(Material.RED_CONCRETE)
                 .withCustomName(Component.text("South Point").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
-        inventory.setItemStack(7, ItemStack.of(Material.PURPLE_CONCRETE)
+        inventory.setItemStack(7, ItemStack.of(Material.GRAY_CONCRETE)
                 .withCustomName(Component.text("West Point").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
         player.playSound(Sound.sound(SoundEvent.BLOCK_ENDER_CHEST_OPEN, Sound.Source.PLAYER, 1f, 1f));
@@ -52,7 +52,7 @@ public class SpawnMenu {
         } else if (clickedItem.material().equals(Material.RED_CONCRETE)) {
             pos = new Pos(-0.5, 29, 36.5, 180, 0);
             player.teleport(pos);
-        } else if (clickedItem.material().equals(Material.PURPLE_CONCRETE)) {
+        } else if (clickedItem.material().equals(Material.GRAY_CONCRETE)) {
             pos = new Pos(-45.5, 28, -0.5, -90, 0);
             player.teleport(pos);
         } else {
