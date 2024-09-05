@@ -42,8 +42,11 @@ public class PlayerSpeedAbility {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_ILLUSIONER_CAST_SPELL, Sound.Source.PLAYER, 1f, 1f));
                 CompletableFuture<Void> timer = Timer.countDown(10, i -> {
-                    player.setLevel(i);
-                    player.setExp(1 - ((float) i / 10f));
+                    player.setExp(1 - ((float) i / (10f * 20f)));
+
+                    if (i % 20 == 0) {
+                        player.setLevel(i / 20);
+                    }
                 });
                 timer.thenRun(() -> {
                     player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, true);

@@ -152,6 +152,11 @@ public class OITC extends BaseGame<OITC.Config> {
             Player player = e.getPlayer();
             ItemStack heldItem = e.getItemStack();
 
+            if (heldItem.material().equals(Material.CROSSBOW) && player.getItemInMainHand().material().equals(Material.COMPASS)) {
+                e.setCancelled(true);
+                return;
+            }
+
             if (heldItem.material().equals(Material.COMPASS)) {
                 OitcMenu.openMenu(player);
                 e.setCancelled(true);

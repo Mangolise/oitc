@@ -34,9 +34,12 @@ public class PlayerDashAbility {
 
             playerDashParticle(player, instance);
 
-            CompletableFuture<Void> timer = Timer.countDown(5, i -> {
-                player.setLevel(i);
-                player.setExp(1 - ((float) i / 5f));
+            CompletableFuture<Void> timer = Timer.countDown(5 * 20, 1, i -> {
+                player.setExp(1 - ((float) i / (5f * 20f)));
+
+                if (i % 20 == 0) {
+                    player.setLevel(i / 20);
+                }
             });
             timer.thenRun(() -> {
                 player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, true);

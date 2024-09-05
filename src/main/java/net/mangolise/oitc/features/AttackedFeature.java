@@ -69,7 +69,7 @@ public class AttackedFeature implements Game.Feature<OITC> {
         EventDispatcher.call(killEvent);
 
         Particle particle = Particle.POOF;
-        poof(particle, victim, 0.1f, instance);
+        poof(particle, victim, 0.1f, instance, 30);
     }
 
     public static void setAmmo(Player player, int amount) {
@@ -111,10 +111,10 @@ public class AttackedFeature implements Game.Feature<OITC> {
         return  -1;
     }
 
-    public static void poof(Particle particle, Player victim, float ExplosionSpeed, Instance instance) {
-        Pos playerPos = victim.getPosition();
+    public static void poof(Particle particle, Player victim, float ExplosionSpeed, Instance instance, int particleAmount) {
+        Pos playerPos = victim.getPosition().sub(0, 1, 0);
 
-        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, 30);
+        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, particleAmount);
         instance.sendGroupedPacket(packet);
     }
 }

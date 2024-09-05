@@ -1,9 +1,11 @@
 package net.mangolise.oitc.menus;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.OITC;
@@ -19,6 +21,7 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public class LeaveMenu {
@@ -45,6 +48,7 @@ public class LeaveMenu {
             timer.thenRun(() -> {
                 Pos respawnPoint = OITC.randomSpawn();
                 player.teleport(respawnPoint);
+                player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
             });
 
             player.eventNode().addListener(GameSdkUtils.singleUseEvent(PlayerMoveEvent.class, f -> {
@@ -53,6 +57,7 @@ public class LeaveMenu {
                 }
 
                 if (!timer.isDone()) {
+                    player.playSound(Sound.sound(SoundEvent.BLOCK_ANVIL_LAND, Sound.Source.PLAYER, 1f, 0.75f));
                     timer.cancel(true);
                 }
 
