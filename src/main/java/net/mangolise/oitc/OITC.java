@@ -196,10 +196,10 @@ public class OITC extends BaseGame<OITC.Config> {
         Random random = new Random();
 
         List<Pos> spawnPositions = List.of(
+                new Pos(-0.5, 29, -42.5, 0, 0),
+                new Pos(37.5, 29, -0.5, 90, 0),
                 new Pos(-0.5, 29, 36.5, 180, 0),
-                new Pos(-0.5, 29, -43.5, 0, 0),
-                new Pos(38.5, 29, -0.5, 90, 0),
-                new Pos(-45.5, 28, -0.5, -90, 0)
+                new Pos(-44.5, 28, -0.5, -90, 0)
         );
 
         return spawnPositions.get(random.nextInt(0, 4));
