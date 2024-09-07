@@ -61,16 +61,22 @@ public class ParticleMenu {
     );
 
     public static void openMenu(Player player) {
-        Inventory inventory = new Inventory(InventoryType.CHEST_4_ROW, "Particle Menu");
+        Inventory inventory = new Inventory(InventoryType.CHEST_5_ROW, "Particle Menu");
         inventory.setTag(OITC.MENU_IS_OPEN, true);
         Particle playerParticle = player.getTag(OITC.PLAYER_ARROW_PARTICLE);
 
-        for (int i = 0; i < particles.size(); i++) {
-            ColoredParticle coloredParticle = particles.get(i);
+        for (int i = 0, j = 0; j < particles.size(); i++) {
+            int row = i % 9;
+            if (row == 0 || row == 8 || (i / 9 == 4 && row == 1)) {
+                continue;
+            }
+
+            ColoredParticle coloredParticle = particles.get(j);
             Particle particle = coloredParticle.particle();
             boolean glowing = particle.equals(playerParticle);
 
-            inventory.addItemStack(makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, i).withGlowing(glowing));
+            inventory.setItemStack(i, makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, j).withGlowing(glowing));
+            j++;
         }
 
         player.playSound(Sound.sound(SoundEvent.BLOCK_CHEST_OPEN, Sound.Source.PLAYER, 0.5f, 1f));

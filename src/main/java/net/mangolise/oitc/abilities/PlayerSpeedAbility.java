@@ -41,7 +41,7 @@ public class PlayerSpeedAbility {
             sprintDuration.thenRun(() -> {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_ILLUSIONER_CAST_SPELL, Sound.Source.PLAYER, 1f, 1f));
-                CompletableFuture<Void> timer = Timer.countDown(10, i -> {
+                CompletableFuture<Void> timer = Timer.countDown(10 * 20, 1, i -> {
                     player.setExp(1 - ((float) i / (10f * 20f)));
 
                     if (i % 20 == 0) {
