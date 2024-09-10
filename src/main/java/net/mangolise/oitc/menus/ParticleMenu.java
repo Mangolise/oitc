@@ -4,13 +4,22 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
+import net.mangolise.gamesdk.util.Timer;
+import net.mangolise.oitc.ArrowEntity;
+import net.mangolise.oitc.DisplayArrowEntity;
 import net.mangolise.oitc.OITC;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -19,8 +28,10 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.potion.PotionType;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.timer.TaskSchedule;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ParticleMenu {
     private static final Tag<Integer> ARROW_PARTICLE = Tag.Integer("arrow_particle");
@@ -86,18 +97,25 @@ public class ParticleMenu {
     public static void handlePreClickEvent(InventoryPreClickEvent e) {
         ItemStack clickedItem = e.getClickedItem();
 
-        if (clickedItem.material().equals(Material.TIPPED_ARROW) && clickedItem.hasTag(ARROW_PARTICLE)) {
-            e.setCancelled(true);
-
-            Player player = e.getPlayer();
-            ColoredParticle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE));
-
-            player.setTag(OITC.PLAYER_ARROW_PARTICLE, particle.particle());
-            player.setTag(OITC.PLAYER_ARROW_COLOR, particle.color());
-            player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
-            player.closeInventory();
-            updateAmmoDisplay(player, player.getTag(OITC.PLAYERS_AMMO_TAG));
+        if (!clickedItem.material().equals(Material.TIPPED_ARROW) || !clickedItem.hasTag(ARROW_PARTICLE)) {
+            return;
         }
+
+        e.setCancelled(true);
+
+        Player player = e.getPlayer();
+        ColoredParticle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE));
+
+        if (e.getClickType().equals(ClickType.RIGHT_CLICK) && e.getPlayer().getPosition().y() > 22.0) {
+            preview(player, particle);
+            return;
+        }
+
+        player.setTag(OITC.PLAYER_ARROW_PARTICLE, particle.particle());
+        player.setTag(OITC.PLAYER_ARROW_COLOR, particle.color());
+        player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
+        player.closeInventory();
+        updateAmmoDisplay(player, player.getTag(OITC.PLAYERS_AMMO_TAG));
     }
 
     public static void updateAmmoDisplay(Player player, int amount) {
@@ -112,8 +130,36 @@ public class ParticleMenu {
     }
 
     private static Component makeArrowName(Particle particle, Color color) {
-        return Component.text(GameSdkUtils.capitaliseFirstLetter(particle.key().value().replace('_', ' ')))
+        return Component.text(ChatUtil.capitaliseFirstLetter(particle.key().value().replace('_', ' ')))
                 .decoration(TextDecoration.ITALIC, false).color(TextColor.color(color));
+    }
+
+    public static void preview(Player player, ColoredParticle particle) {
+        Pos pos = new Pos(1000, 100, 0);
+        final Pos originalPos = player.getPosition();
+
+        player.setInvisible(true);
+        player.setFlying(true);
+        player.setAllowFlying(true);
+        player.teleport(pos);
+        player.closeInventory();
+
+        final Pos spawnPosition = new Pos(player.getPosition().add(0, 1.5, 0));
+
+        CompletableFuture<Void> timer = Timer.countDownForPlayer(1, player);
+        timer.thenRun(() -> {
+            DisplayArrowEntity arrow = new DisplayArrowEntity(player, particle);
+            arrow.updateViewableRule(viewer -> viewer.getUuid().equals(player.getUuid()));
+            arrow.setInstance(player.getInstance(), spawnPosition);
+            arrow.setVelocity(player.getPosition().direction().mul(75));
+        });
+
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            player.setInvisible(false);
+            player.setFlying(false);
+            player.setAllowFlying(false);
+            player.teleport(originalPos);
+        }, TaskSchedule.seconds(3), TaskSchedule.stop());
     }
 
     public record ColoredParticle(Color color, Particle particle) {}

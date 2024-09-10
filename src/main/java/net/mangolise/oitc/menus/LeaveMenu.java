@@ -9,6 +9,7 @@ import net.kyori.adventure.title.Title;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.OITC;
+import net.mangolise.oitc.events.PlayerLeaveEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -64,6 +65,7 @@ public class LeaveMenu {
                 return true;
             }));
         } else if (clickedItem.material().equals(Material.ENDER_PEARL)) {
+            MinecraftServer.getGlobalEventHandler().call(new PlayerLeaveEvent(player));
             return;
         }  else {
             return;

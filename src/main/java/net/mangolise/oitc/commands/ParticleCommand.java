@@ -2,19 +2,13 @@ package net.mangolise.oitc.commands;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.features.commands.MangoliseCommand;
-import net.mangolise.gamesdk.util.GameSdkUtils;
-import net.mangolise.oitc.menus.ParticleMenu;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.particle.Particle;
-
-import java.util.Arrays;
-import java.util.Set;
 
 import static net.mangolise.oitc.OITC.PLAYER_ARROW_PARTICLE;
 
@@ -33,8 +27,8 @@ public class ParticleCommand extends MangoliseCommand {
         for (Particle value : Particle.values()) {
             if (particle.equalsIgnoreCase(value.name())) {
                 sender.setTag(PLAYER_ARROW_PARTICLE, value);
-                sender.sendMessage(Component.text("Selected Particle: ").decoration(TextDecoration.ITALIC, false)
-                        .color(NamedTextColor.GREEN).append(Component.text(GameSdkUtils.capitaliseFirstLetter(particleLabel))
+                sender.sendMessage(Component.text("Selected particle: ").decoration(TextDecoration.ITALIC, false)
+                        .color(NamedTextColor.GREEN).append(Component.text(ChatUtil.snakeCaseToTitleCase(particleLabel))
                                 .color(NamedTextColor.GOLD)));
                 break;
             }
