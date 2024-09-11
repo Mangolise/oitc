@@ -2,6 +2,7 @@ package net.mangolise.oitc.menus;
 
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.ChatUtil;
@@ -86,7 +87,9 @@ public class ParticleMenu {
             Particle particle = coloredParticle.particle();
             boolean glowing = particle.equals(playerParticle);
 
-            inventory.setItemStack(i, makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, j).withGlowing(glowing));
+            inventory.setItemStack(i, makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, j).withGlowing(glowing)
+                    .withLore(Component.text("Right-Click ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)
+                            .append(Component.text("to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GREEN))));
             j++;
         }
 
@@ -125,7 +128,7 @@ public class ParticleMenu {
     }
 
     private static ItemStack makeColoredArrow(Particle particle, Color color) {
-        return ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, new PotionContents(PotionType.AWKWARD, color))
+        return ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, new PotionContents(PotionType.AWKWARD, color)).withoutExtraTooltip()
                 .withCustomName(makeArrowName(particle, color));
     }
 
@@ -144,14 +147,15 @@ public class ParticleMenu {
         player.teleport(pos);
         player.closeInventory();
 
-        final Pos spawnPosition = new Pos(player.getPosition().add(0, 1.5, 0));
+        player.playSound(Sound.sound(SoundEvent.ENTITY_ENDERMAN_TELEPORT, Sound.Source.PLAYER, 1f, 1f));
+        final Pos spawnPosition = new Pos(1035, 96.5, 6.5);
 
         CompletableFuture<Void> timer = Timer.countDownForPlayer(1, player);
         timer.thenRun(() -> {
             DisplayArrowEntity arrow = new DisplayArrowEntity(player, particle);
             arrow.updateViewableRule(viewer -> viewer.getUuid().equals(player.getUuid()));
             arrow.setInstance(player.getInstance(), spawnPosition);
-            arrow.setVelocity(player.getPosition().direction().mul(75));
+            arrow.setVelocity(new Vec(-60, 15.0, 0));
         });
 
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
@@ -159,7 +163,9 @@ public class ParticleMenu {
             player.setFlying(false);
             player.setAllowFlying(false);
             player.teleport(originalPos);
+            player.playSound(Sound.sound(SoundEvent.ENTITY_ENDERMAN_TELEPORT, Sound.Source.PLAYER, 1f, 1f));
         }, TaskSchedule.seconds(3), TaskSchedule.stop());
+        player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
     }
 
     public record ColoredParticle(Color color, Particle particle) {}
