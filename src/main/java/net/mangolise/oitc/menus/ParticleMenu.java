@@ -6,9 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.ChatUtil;
-import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
-import net.mangolise.oitc.ArrowEntity;
 import net.mangolise.oitc.DisplayArrowEntity;
 import net.mangolise.oitc.OITC;
 import net.minestom.server.MinecraftServer;
@@ -17,7 +15,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
-import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.click.ClickType;
@@ -87,9 +84,26 @@ public class ParticleMenu {
             Particle particle = coloredParticle.particle();
             boolean glowing = particle.equals(playerParticle);
 
-            inventory.setItemStack(i, makeColoredArrow(particle, coloredParticle.color()).withTag(ARROW_PARTICLE, j).withGlowing(glowing)
-                    .withLore(Component.text("Right-Click ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)
-                            .append(Component.text("to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GREEN))));
+            Color color = coloredParticle.color();
+
+            boolean unlocked = player.hasPermission("oitc.particle." + particle.key().value());
+            if (!unlocked) {
+                color = new Color(150, 150, 150);
+            }
+
+            ItemStack arrow = makeColoredArrow(particle, color).withTag(ARROW_PARTICLE, j).withGlowing(glowing);
+
+            Component lore = Component.text("Right-Click ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)
+                    .append(Component.text("to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GREEN));
+
+            if (unlocked) {
+                arrow = arrow.withLore(lore);
+            } else {
+                arrow = arrow.withLore(lore, Component.text("Currently Locked").decoration(TextDecoration.ITALIC, false)
+                        .color(NamedTextColor.DARK_GRAY));
+            }
+
+            inventory.setItemStack(i, arrow);
             j++;
         }
 
@@ -111,6 +125,10 @@ public class ParticleMenu {
 
         if (e.getClickType().equals(ClickType.RIGHT_CLICK) && e.getPlayer().getPosition().y() > 22.0) {
             preview(player, particle);
+            return;
+        }
+
+        if (!player.hasPermission("oitc.particle." + particle.particle().key().value())) {
             return;
         }
 
