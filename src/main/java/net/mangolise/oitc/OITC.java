@@ -47,7 +47,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(ParticleMenu.particles.getFirst().particle());
     public static final Tag<Color> PLAYER_ARROW_COLOR = Tag.<Color>Transient("player_arrow_color").defaultValue(ParticleMenu.particles.getFirst().color());
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
-    public static final Tag<Boolean> MENU_IS_OPEN = Tag.Boolean("particle_menu_is_open").defaultValue(false);
+    public static final Tag<String> MENU_ID = Tag.String("menu_id");
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
@@ -114,34 +114,19 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
-            if (e.getInventory() != null && e.getInventory().getTag(MENU_IS_OPEN)) {
+            if (e.getClickedItem().material().equals(Material.TIPPED_ARROW)) {
                 e.setCancelled(true);
             }
 
-            if (e.getClickedItem().material().equals(Material.CHEST)) {
-                ParticleMenu.openMenu(e.getPlayer());
-                e.setCancelled(true);
+            if (e.getInventory() == null) {
                 return;
-            } else if (e.getClickedItem().material().equals(Material.COMPASS)) {
-                OitcMenu.openMenu(e.getPlayer());
-                e.setCancelled(true);
-                return;
-            } else if (e.getClickedItem().material().equals(Material.ENDER_CHEST) && e.getPlayer().getPosition().y() > 22.0) {
-                SpawnMenu.openMenu(e.getPlayer());
-                e.setCancelled(true);
-                return;
-            } else if (e.getClickedItem().material().equals(Material.ECHO_SHARD) && e.getPlayer().getPosition().y() > 22.0) {
-                AbilitiesMenu.openMenu(e.getPlayer());
-                e.setCancelled(true);
-                return;
-            } else if (e.getClickedItem().material().equals(Material.NETHER_STAR)) {
-                LeaveMenu.openMenu(e.getPlayer());
-                e.setCancelled(true);
-                return;
-            } else if (e.getClickedItem().material().equals(Material.TIPPED_ARROW)) {
+            }
+
+            if (e.getInventory().hasTag(MENU_ID)) {
                 e.setCancelled(true);
             }
 
+            OitcMenu.handlePreClickEvent(e);
             ParticleMenu.handlePreClickEvent(e);
             SpawnMenu.handlePreClickEvent(e, e.getPlayer());
             AbilitiesMenu.handlePreClickEvent(e, e.getPlayer());

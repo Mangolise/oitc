@@ -71,7 +71,7 @@ public class ParticleMenu {
 
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_5_ROW, "Particle Menu");
-        inventory.setTag(OITC.MENU_IS_OPEN, true);
+        inventory.setTag(OITC.MENU_ID, "particle_menu");
         Particle playerParticle = player.getTag(OITC.PLAYER_ARROW_PARTICLE);
 
         for (int i = 0, j = 0; j < particles.size(); i++) {
@@ -112,6 +112,10 @@ public class ParticleMenu {
     }
 
     public static void handlePreClickEvent(InventoryPreClickEvent e) {
+        if (!"particle_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
+            return;
+        }
+
         ItemStack clickedItem = e.getClickedItem();
 
         if (!clickedItem.material().equals(Material.TIPPED_ARROW) || !clickedItem.hasTag(ARROW_PARTICLE)) {

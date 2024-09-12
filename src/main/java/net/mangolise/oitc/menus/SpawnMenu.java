@@ -17,7 +17,7 @@ import net.minestom.server.sound.SoundEvent;
 public class SpawnMenu {
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Spawn Point Menu");
-        inventory.setTag(OITC.MENU_IS_OPEN, true);
+        inventory.setTag(OITC.MENU_ID, "spawn_menu");
 
         inventory.setItemStack(1, ItemStack.of(Material.BLUE_CONCRETE)
                 .withCustomName(Component.text("North Point").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
@@ -36,6 +36,10 @@ public class SpawnMenu {
     }
 
     public static void handlePreClickEvent(InventoryPreClickEvent e, Player player) {
+        if (!"spawn_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
+            return;
+        }
+
         if (player.getPosition().y() < 22.0) {
             return;
         }

@@ -1,11 +1,9 @@
 package net.mangolise.oitc.menus;
 
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.OITC;
@@ -22,13 +20,12 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.sound.SoundEvent;
 
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public class LeaveMenu {
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Abilities Menu");
-        inventory.setTag(OITC.MENU_IS_OPEN, true);
+        inventory.setTag(OITC.MENU_ID, "leave_menu");
 
         inventory.setItemStack(2, ItemStack.of(Material.RECOVERY_COMPASS)
                 .withCustomName(Component.text("Respawn").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
@@ -41,6 +38,9 @@ public class LeaveMenu {
     }
 
     public static void handlePreClickEvent(InventoryPreClickEvent e, Player player) {
+        if (!"leave_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
+            return;
+        }
 
         ItemStack clickedItem = e.getClickedItem();
 

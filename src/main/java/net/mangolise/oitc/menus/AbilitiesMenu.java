@@ -18,7 +18,7 @@ import net.minestom.server.sound.SoundEvent;
 public class AbilitiesMenu {
     public static void openMenu(Player player) {
         Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Abilities Menu");
-        inventory.setTag(OITC.MENU_IS_OPEN, true);
+        inventory.setTag(OITC.MENU_ID, "abilities_menu");
 
         inventory.setItemStack(2, ItemStack.of(Material.FEATHER)
                 .withCustomName(Component.text("Dash").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GREEN)));
@@ -34,6 +34,10 @@ public class AbilitiesMenu {
     }
 
     public static void handlePreClickEvent(InventoryPreClickEvent e, Player player) {
+        if (!"abilities_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
+            return;
+        }
+
         if (player.getPosition().y() < 22.0) {
             return;
         }
