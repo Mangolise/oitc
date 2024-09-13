@@ -35,7 +35,7 @@ public class ScoreboardFeature implements Game.Feature<OITC> {
             Player attacker = instance.getPlayerByUuid(entry.getKey());
             assert attacker != null;
 
-            sidebarBuilder.addLine(ChatUtil.getDisplayName(attacker).append(Component.text(": " + entry.getValue())));
+            sidebarBuilder.addLine(ChatUtil.getDisplayName(attacker).append(Component.text(": " + entry.getValue()).color(NamedTextColor.GRAY)));
         });
 
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
