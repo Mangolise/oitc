@@ -127,8 +127,9 @@ public class ParticleMenu {
         Player player = e.getPlayer();
         ColoredParticle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE));
 
-        if (e.getClickType().equals(ClickType.RIGHT_CLICK) && e.getPlayer().getPosition().y() > 22.0) {
+        if (e.getClickType().equals(ClickType.RIGHT_CLICK) && e.getPlayer().getPosition().y() > 22.0 && e.getPlayer().getPosition().y() < 60) {
             preview(player, particle);
+            player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
             return;
         }
 
@@ -136,9 +137,13 @@ public class ParticleMenu {
             return;
         }
 
+        if (e.getClickType().equals(ClickType.RIGHT_CLICK)) {
+            return;
+        } else {
+            player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
+        }
         player.setTag(OITC.PLAYER_ARROW_PARTICLE, particle.particle());
         player.setTag(OITC.PLAYER_ARROW_COLOR, particle.color());
-        player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
         player.closeInventory();
         updateAmmoDisplay(player, player.getTag(OITC.PLAYERS_AMMO_TAG));
     }
@@ -160,7 +165,7 @@ public class ParticleMenu {
     }
 
     public static void preview(Player player, ColoredParticle particle) {
-        Pos pos = new Pos(1000, 100, 0);
+        Pos pos = new Pos(1000, 150, 0);
         final Pos originalPos = player.getPosition();
 
         player.setInvisible(true);
@@ -170,7 +175,7 @@ public class ParticleMenu {
         player.closeInventory();
 
         player.playSound(Sound.sound(SoundEvent.ENTITY_ENDERMAN_TELEPORT, Sound.Source.PLAYER, 1f, 1f));
-        final Pos spawnPosition = new Pos(1035, 96.5, 6.5);
+        final Pos spawnPosition = new Pos(1035, 146.5, 6.5);
 
         CompletableFuture<Void> timer = Timer.countDownForPlayer(1, player);
         timer.thenRun(() -> {
@@ -187,7 +192,6 @@ public class ParticleMenu {
             player.teleport(originalPos);
             player.playSound(Sound.sound(SoundEvent.ENTITY_ENDERMAN_TELEPORT, Sound.Source.PLAYER, 1f, 1f));
         }, TaskSchedule.seconds(3), TaskSchedule.stop());
-        player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
     }
 
     public record ColoredParticle(Color color, Particle particle) {}
