@@ -100,7 +100,7 @@ public class ParticleMenu {
                 arrow = arrow.withLore(lore);
             } else {
                 arrow = arrow.withLore(lore, Component.text("Currently Locked").decoration(TextDecoration.ITALIC, false)
-                        .color(NamedTextColor.DARK_GRAY));
+                        .color(NamedTextColor.RED));
             }
 
             inventory.setItemStack(i, arrow);
@@ -134,6 +134,7 @@ public class ParticleMenu {
         }
 
         if (!player.hasPermission("oitc.particle." + particle.particle().key().value())) {
+            player.playSound(Sound.sound(SoundEvent.ENTITY_VILLAGER_NO, Sound.Source.PLAYER, 1f, 1f));
             return;
         }
 
