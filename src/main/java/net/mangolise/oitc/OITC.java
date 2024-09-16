@@ -82,7 +82,9 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, e -> {
             Player player = e.getPlayer();
 
-            kills.put(player.getUuid(), 0);
+            if (!kills.containsKey(player.getUuid())) {
+                kills.put(player.getUuid(), 0);
+            }
 
             Sidebar sidebar = new Sidebar(Component.text("One in the Chamber").decorate(TextDecoration.BOLD).color(TextColor.color(255, 172, 0)));
             sidebar.addViewer(player);
@@ -111,6 +113,7 @@ public class OITC extends BaseGame<OITC.Config> {
                 ScoreboardFeature.updateSidebar(player1, instance, kills);
             }
         });
+
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
