@@ -7,35 +7,38 @@ import net.mangolise.gamesdk.Game;
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.SidebarBuilder;
 import net.mangolise.oitc.OITC;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.scoreboard.Sidebar;
 
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public class ScoreboardFeature implements Game.Feature<OITC> {
     private static String ip;
 
-    public static void updateSidebar(Player player, Instance instance, Map<UUID, Integer> kills) {
-        Set<Map.Entry<UUID, Integer>> killSet = kills.entrySet();
+    public static void updateSidebar(Player player) {
         SidebarBuilder sidebarBuilder = new SidebarBuilder();
         Sidebar sidebar = player.getTag(OITC.PLAYER_SIDEBAR);
+        int totalKills = player.getTag(OITC.PLAYER_KILLS);
+        int deaths = player.getTag(OITC.PLAYER_DEATHS);
 
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
 
         sidebarBuilder.addLine(Component.text("Kill Streak: ").color(TextColor.color(NamedTextColor.GRAY))
                 .append(Component.text(player.getTag(OITC.PLAYER_KILL_STREAK)).color(NamedTextColor.GRAY)));
 
+        sidebarBuilder.addLine(Component.text("Total Kills: ").color(TextColor.color(NamedTextColor.GRAY))
+                .append(Component.text(totalKills).color(NamedTextColor.GRAY)));
+
+        sidebarBuilder.addLine(Component.text("Deaths: ").color(TextColor.color(NamedTextColor.GRAY))
+                .append(Component.text(deaths).color(NamedTextColor.GRAY)));
+
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
 
-        killSet.stream().sorted(Comparator.comparingInt(entry -> -entry.getValue())).limit(5).forEach(entry -> {
-            Player attacker = instance.getPlayerByUuid(entry.getKey());
-            assert attacker != null;
-
-            sidebarBuilder.addLine(ChatUtil.getDisplayName(attacker).append(Component.text(": " + entry.getValue()).color(NamedTextColor.GRAY)));
+        MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
+                .sorted(Comparator.comparingInt(entry -> -entry.getTag(OITC.PLAYER_KILLS))).limit(5).forEach(attacker -> {
+            sidebarBuilder.addLine(ChatUtil.getDisplayName(attacker)
+                    .append(Component.text(": " + attacker.getTag(OITC.PLAYER_KILLS)).color(NamedTextColor.GRAY)));
         });
 
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));

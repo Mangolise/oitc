@@ -20,6 +20,15 @@ public class OitcMenu {
                 .withCustomName(Component.text("Particle Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
         if (player.getPosition().y() < 22.0) {
+            inventory.setItemStack(12, ItemStack.of(Material.BARRIER)
+                    .withCustomName(Component.text("Spawn Point Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
+                    .withLore(Component.text("Unavailable while in battlefield").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_RED)));
+        } else {
+            inventory.setItemStack(12, ItemStack.of(Material.ENDER_CHEST)
+                    .withCustomName(Component.text("Spawn Point Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
+        }
+
+        if (player.getPosition().y() < 22.0) {
             inventory.setItemStack(14, ItemStack.of(Material.BARRIER)
                     .withCustomName(Component.text("Abilities Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
                     .withLore(Component.text("Unavailable while in battlefield").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_RED)));
@@ -29,16 +38,7 @@ public class OitcMenu {
         }
 
         inventory.setItemStack(16, ItemStack.of(Material.NETHER_STAR)
-                .withCustomName(Component.text("Leave Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
-
-        if (player.getPosition().y() < 22.0) {
-            inventory.setItemStack(12, ItemStack.of(Material.BARRIER)
-                    .withCustomName(Component.text("Spawn Point Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
-                    .withLore(Component.text("Unavailable while in battlefield").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_RED)));
-        } else {
-            inventory.setItemStack(12, ItemStack.of(Material.ENDER_CHEST)
-                    .withCustomName(Component.text("Spawn Point Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
-        }
+                .withCustomName(Component.text("Utilities Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
         player.openInventory(inventory);
     }
@@ -48,20 +48,20 @@ public class OitcMenu {
             return;
         }
 
-        if (e.getClickedItem().material().equals(Material.CHEST)) {
-            ParticleMenu.openMenu(e.getPlayer());
-            e.setCancelled(true);
-        } else if (e.getClickedItem().material().equals(Material.COMPASS)) {
+        if (e.getClickedItem().material().equals(Material.COMPASS)) {
             OitcMenu.openMenu(e.getPlayer());
             e.setCancelled(true);
-        } else if (e.getClickedItem().material().equals(Material.ENDER_CHEST) && e.getPlayer().getPosition().y() > 22.0) {
+        } else if (e.getClickedItem().material().equals(Material.CHEST)) {
+            ParticleMenu.openMenu(e.getPlayer());
+            e.setCancelled(true);
+        } else if (e.getClickedItem().material().equals(Material.ENDER_CHEST)) {
             SpawnMenu.openMenu(e.getPlayer());
             e.setCancelled(true);
         } else if (e.getClickedItem().material().equals(Material.ECHO_SHARD) && e.getPlayer().getPosition().y() > 22.0) {
             AbilitiesMenu.openMenu(e.getPlayer());
             e.setCancelled(true);
         } else if (e.getClickedItem().material().equals(Material.NETHER_STAR)) {
-            LeaveMenu.openMenu(e.getPlayer());
+            UtilitiesMenu.openMenu(e.getPlayer());
             e.setCancelled(true);
         }
     }

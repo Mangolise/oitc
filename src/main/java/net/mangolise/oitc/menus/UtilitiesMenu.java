@@ -22,15 +22,18 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-public class LeaveMenu {
+public class UtilitiesMenu {
     public static void openMenu(Player player) {
-        Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Abilities Menu");
-        inventory.setTag(OITC.MENU_ID, "leave_menu");
+        Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Utilities Menu");
+        inventory.setTag(OITC.MENU_ID, "utilities_menu");
 
-        inventory.setItemStack(2, ItemStack.of(Material.RECOVERY_COMPASS)
+        inventory.setItemStack(1, ItemStack.of(Material.RECOVERY_COMPASS)
                 .withCustomName(Component.text("Respawn").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
-        inventory.setItemStack(6, ItemStack.of(Material.ENDER_PEARL)
+        inventory.setItemStack(4, ItemStack.of(Material.ENDER_EYE)
+                .withCustomName(Component.text("Stats").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
+
+        inventory.setItemStack(7, ItemStack.of(Material.ENDER_PEARL)
                 .withCustomName(Component.text("Leave").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_AQUA)));
 
         player.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_CLUSTER_BREAK, Sound.Source.PLAYER, 1f, 1f));
@@ -38,7 +41,7 @@ public class LeaveMenu {
     }
 
     public static void handlePreClickEvent(InventoryPreClickEvent e, Player player) {
-        if (!"leave_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
+        if (!"utilities_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
             return;
         }
 
@@ -64,6 +67,9 @@ public class LeaveMenu {
 
                 return true;
             }));
+        } else if (clickedItem.material().equals(Material.ENDER_EYE)) {
+            StatsMenu.openMenu(player);
+            return;
         } else if (clickedItem.material().equals(Material.ENDER_PEARL)) {
             MinecraftServer.getGlobalEventHandler().call(new PlayerLeaveEvent(player));
             return;

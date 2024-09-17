@@ -49,6 +49,12 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
     public static final Tag<String> MENU_ID = Tag.String("menu_id");
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
+    public static final Tag<Integer> PLAYER_KILLS = Tag.Integer("player_kills").defaultValue(0);
+    public static final Tag<Integer> PLAYER_CROSSBOW_KILLS = Tag.Integer("player_crossbow_kills").defaultValue(0);
+    public static final Tag<Integer> PLAYER_SWORD_KILLS = Tag.Integer("player_sword_kills").defaultValue(0);
+    public static final Tag<Integer> PLAYER_DEATHS = Tag.Integer("player_deaths").defaultValue(0);
+    public static final Tag<Integer> PLAYER_DEATHS_BY_SWORD = Tag.Integer("player_deaths_by_sword").defaultValue(0);
+    public static final Tag<Integer> PLAYER_DEATHS_BY_CROSSBOW = Tag.Integer("player_deaths_by_crossbow").defaultValue(0);
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
             .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
@@ -60,7 +66,6 @@ public class OITC extends BaseGame<OITC.Config> {
     public static Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
 
     Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer(GameSdkUtils.getPolarLoaderFromResource("worlds/fruit.polar"));
-    Map<UUID, Integer> kills = new HashMap<>();
 
     @Override
     public void setup() {
@@ -82,15 +87,11 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(PlayerSpawnEvent.class, e -> {
             Player player = e.getPlayer();
 
-            if (!kills.containsKey(player.getUuid())) {
-                kills.put(player.getUuid(), 0);
-            }
-
             Sidebar sidebar = new Sidebar(Component.text("One in the Chamber").decorate(TextDecoration.BOLD).color(TextColor.color(255, 172, 0)));
             sidebar.addViewer(player);
             player.setTag(PLAYER_SIDEBAR, sidebar);
             for (Player player1 : instance.getPlayers()) {
-                ScoreboardFeature.updateSidebar(player1, instance, kills);
+                ScoreboardFeature.updateSidebar(player1);
             }
 
             player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1000);
@@ -108,9 +109,8 @@ public class OITC extends BaseGame<OITC.Config> {
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerDisconnectEvent.class, e -> {
-            kills.remove(e.getPlayer().getUuid());
             for (Player player1 : instance.getPlayers()) {
-                ScoreboardFeature.updateSidebar(player1, instance, kills);
+                ScoreboardFeature.updateSidebar(player1);
             }
         });
 
@@ -133,7 +133,7 @@ public class OITC extends BaseGame<OITC.Config> {
             ParticleMenu.handlePreClickEvent(e);
             SpawnMenu.handlePreClickEvent(e, e.getPlayer());
             AbilitiesMenu.handlePreClickEvent(e, e.getPlayer());
-            LeaveMenu.handlePreClickEvent(e, e.getPlayer());
+            UtilitiesMenu.handlePreClickEvent(e, e.getPlayer());
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, e -> {
@@ -171,7 +171,7 @@ public class OITC extends BaseGame<OITC.Config> {
             if (!(e.getTarget() instanceof Player player)) return;
 
             if (arrowEntity.getShooter() instanceof Player shooter) {
-                AttackedFeature.attacked(player, shooter, false, instance, kills);
+                AttackedFeature.attacked(player, shooter, false, instance);
             }
             e.getEntity().remove();
         });
@@ -180,7 +180,7 @@ public class OITC extends BaseGame<OITC.Config> {
             Entity entity = e.getTarget();
 
             if (entity instanceof Player player && e.getEntity() instanceof Player attacker && attacker.getItemInMainHand().material() == Material.IRON_SWORD) {
-                AttackedFeature.attacked(player, attacker, true, instance, kills);
+                AttackedFeature.attacked(player, attacker, true, instance);
             }
         });
     }

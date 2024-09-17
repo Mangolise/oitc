@@ -21,8 +21,6 @@ import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class AttackedFeature implements Game.Feature<OITC> {
@@ -30,16 +28,25 @@ public class AttackedFeature implements Game.Feature<OITC> {
 
     }
 
-    public static void attacked(Player victim, Player attacker, boolean fromSword, Instance instance, Map<UUID, Integer> kills) {
+    public static void attacked(Player victim, Player attacker, boolean fromSword, Instance instance) {
         // player spawn is above y level 22
         if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
                 victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
-        int killCount = kills.get(attacker.getUuid()) + 1;
+        int killCount = attacker.getAndUpdateTag(OITC.PLAYER_KILLS, kills -> kills + 1) + 1;
+        victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
         victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
         attacker.updateTag(OITC.PLAYER_KILL_STREAK, streak -> streak + 1);
+
+        if (fromSword) {
+            victim.updateTag(OITC.PLAYER_DEATHS_BY_SWORD, swordDeaths -> swordDeaths + 1);
+            attacker.updateTag(OITC.PLAYER_SWORD_KILLS, swordKills -> swordKills + 1);
+        } else {
+            victim.updateTag(OITC.PLAYER_DEATHS_BY_CROSSBOW, crossbowDeaths -> crossbowDeaths + 1);
+            attacker.updateTag(OITC.PLAYER_CROSSBOW_KILLS, crossbowKills -> crossbowKills + 1);
+        }
 
         // instead of killing player, this fakes players death by teleporting them.
         KillMessages.sendDeathMessage(instance, victim, attacker, fromSword);
@@ -56,10 +63,8 @@ public class AttackedFeature implements Game.Feature<OITC> {
 
         setAmmo(victim, 1);
 
-        kills.put(attacker.getUuid(), killCount);
-
         for (Player player : instance.getPlayers()) {
-            ScoreboardFeature.updateSidebar(player, instance, kills);
+            ScoreboardFeature.updateSidebar(player);
         }
 
         int killStreak = attacker.getTag(OITC.PLAYER_KILL_STREAK);
