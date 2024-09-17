@@ -17,6 +17,8 @@ import net.minestom.server.sound.SoundEvent;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayerSpeedAbility {
+    private static final int COOLDOWN_SECONDS = 6;
+
     public static void playerSpeedAbility(PlayerSwapItemEvent e) {
         e.setCancelled(true);
         Instance instance = e.getInstance();
@@ -30,13 +32,13 @@ public class PlayerSpeedAbility {
                 }
             }
 
-            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player));
+            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
             player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.18);
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
             instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_WIND_BURST, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
             // 8 * 20 is converting the timer from seconds into ticks.
-            CompletableFuture<Void> sprintDuration = Timer.countDown(6 * 20, 1, i -> spawnParticle(i, player, instance));
+            CompletableFuture<Void> sprintDuration = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> spawnParticle(i, player, instance));
 
             sprintDuration.thenRun(() -> {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
