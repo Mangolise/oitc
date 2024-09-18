@@ -18,20 +18,19 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.timer.Task;
-import net.minestom.server.timer.TaskSchedule;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerTeleportAbility {
+    private static final int COOLDOWN_SECONDS = 8;
+
     public static void playerTeleportAbility(PlayerSwapItemEvent e) {
         e.setCancelled(true);
         Instance instance = e.getInstance();
         Player player = e.getPlayer();
 
         if (e.getPlayer().getTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY)) {
-            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player));
+            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
 
             Entity pearl = new EntityProjectile(player, EntityType.ENDER_PEARL);
 
@@ -52,7 +51,7 @@ public class PlayerTeleportAbility {
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
             instance.playSound(Sound.sound(SoundEvent.ENTITY_WIND_CHARGE_THROW, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
-            CompletableFuture<Void> timer = Timer.countDown(8 * 20, 1, i -> {
+            CompletableFuture<Void> timer = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> {
                 player.setExp(1 - ((float) i / (8f * 20f)));
 
                 if (i % 20 == 0) {

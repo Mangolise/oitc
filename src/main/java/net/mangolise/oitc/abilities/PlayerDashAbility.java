@@ -20,13 +20,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerDashAbility {
+    private static final int COOLDOWN_SECONDS = 5;
+
     public static void playerDashAbility(PlayerSwapItemEvent e) {
         e.setCancelled(true);
         Instance instance = e.getInstance();
         Player player = e.getPlayer();
 
         if (e.getPlayer().getTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY)) {
-            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player));
+            MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
             Vec pos = player.getPosition().direction();
             player.setVelocity(pos.mul(40, 20, 40));
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
@@ -34,7 +36,7 @@ public class PlayerDashAbility {
 
             playerDashParticle(player, instance);
 
-            CompletableFuture<Void> timer = Timer.countDown(5 * 20, 1, i -> {
+            CompletableFuture<Void> timer = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> {
                 player.setExp(1 - ((float) i / (5f * 20f)));
 
                 if (i % 20 == 0) {
