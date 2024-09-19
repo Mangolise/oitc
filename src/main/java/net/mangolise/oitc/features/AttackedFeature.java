@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.Game;
+import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.KillMessages;
 import net.mangolise.oitc.OITC;
@@ -85,6 +86,7 @@ public class AttackedFeature implements Game.Feature<OITC> {
             CompletableFuture<Void> timer = OITC.arrowCountdown.get(player.getUuid());
             timer.complete(null);
             player.sendActionBar(Component.text());
+            GameSdkUtils.stopCooldown(player, "arrow");
         }
 
         if (amount <= 0) {
@@ -97,6 +99,7 @@ public class AttackedFeature implements Game.Feature<OITC> {
             });
             OITC.arrowCountdown.put(player.getUuid(), timer);
             player.getInventory().setItemStack(findCrossbow(player), OITC.crossbow);
+            GameSdkUtils.startCooldown(player, "arrow", Material.ARROW, 10 * 1000);
         } else {
             player.getInventory().setItemStack(findCrossbow(player), OITC.chargedCrossbow);
         }

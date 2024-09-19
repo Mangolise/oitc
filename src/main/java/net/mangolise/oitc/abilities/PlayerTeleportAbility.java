@@ -1,6 +1,7 @@
 package net.mangolise.oitc.abilities;
 
 import net.kyori.adventure.sound.Sound;
+import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.events.PlayerAbilityEvent;
 import net.mangolise.oitc.features.AbilitiesFeature;
@@ -15,6 +16,7 @@ import net.minestom.server.event.entity.EntityTickEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
@@ -31,6 +33,7 @@ public class PlayerTeleportAbility {
 
         if (e.getPlayer().getTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY)) {
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
+            GameSdkUtils.startCooldown(player, "teleport", Material.ENDER_PEARL, COOLDOWN_SECONDS * 1000);
 
             Entity pearl = new EntityProjectile(player, EntityType.ENDER_PEARL);
 

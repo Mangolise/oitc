@@ -1,6 +1,7 @@
 package net.mangolise.oitc.abilities;
 
 import net.kyori.adventure.sound.Sound;
+import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.events.PlayerAbilityEvent;
 import net.mangolise.oitc.features.AbilitiesFeature;
@@ -10,6 +11,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerSwapItemEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
@@ -29,6 +31,7 @@ public class PlayerDashAbility {
 
         if (e.getPlayer().getTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY)) {
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
+            GameSdkUtils.startCooldown(player, "dash", Material.FEATHER, COOLDOWN_SECONDS * 1000);
             Vec pos = player.getPosition().direction();
             player.setVelocity(pos.mul(40, 20, 40));
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);

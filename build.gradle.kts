@@ -11,6 +11,7 @@ version = versionStr
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://maven.serble.net/snapshots/")
 }
 

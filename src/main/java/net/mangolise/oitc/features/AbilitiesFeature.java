@@ -1,6 +1,7 @@
 package net.mangolise.oitc.features;
 
 import net.mangolise.gamesdk.Game;
+import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.oitc.OITC;
 import net.mangolise.oitc.abilities.AbilityType;
 import net.mangolise.oitc.abilities.PlayerDashAbility;
@@ -57,6 +58,19 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
         if (abilityCountDown.containsKey(player.getUuid())) {
             CompletableFuture<Void> timer = abilityCountDown.get(player.getUuid());
             timer.complete(null);
+
+            AbilityType abilityType = player.getTag(AbilitiesFeature.PLAYER_SELECTED_ABILITY);
+            String cooldown = switch (abilityType) {
+                case TELEPORT -> "teleport";
+                case SPEED -> "speedability";
+                case DASH -> "dash";
+            };
+
+            GameSdkUtils.stopCooldown(player, cooldown);
+
+            if (cancelAbility && abilityType == AbilityType.SPEED) {
+                GameSdkUtils.stopCooldown(player, "speed");
+            }
         }
     }
 }
