@@ -21,7 +21,7 @@ public class KillMessages {
             " suffered a fatal encounter with ",
             " was sent to the afterlife by ",
             " got a surprise visit from ",
-            " got the last laugh from ",
+            " could not handle ",
             " had their lights turned off by ",
             " found themselves on the wrong side of ",
             " was caught in the crossfire of ",
