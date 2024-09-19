@@ -40,7 +40,15 @@ public class StatsMenu {
                 .append(Component.text("Crossbow: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD))
                 .append(Component.text(player.getTag(OITC.PLAYER_CROSSBOW_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
-        inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore));
+        double kdr = player.getTag(OITC.PLAYER_KILLS);
+        if (player.getTag(OITC.PLAYER_DEATHS) != 0) {
+            kdr /= player.getTag(OITC.PLAYER_DEATHS);
+        }
+
+        Component killDeathsLore = Component.text("K/D Ratio: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
+                .append(Component.text(kdr).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+
+        inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore, killDeathsLore));
 
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
         player.openInventory(inventory);
