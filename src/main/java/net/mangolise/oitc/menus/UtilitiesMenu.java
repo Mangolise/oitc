@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.OITC;
+import net.mangolise.oitc.events.KillEvent;
 import net.mangolise.oitc.events.PlayerLeaveEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -54,6 +55,14 @@ public class UtilitiesMenu {
                 player.teleport(respawnPoint);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
             });
+
+            player.eventNode().addListener(GameSdkUtils.singleUseEvent(KillEvent.class, g -> {
+                if (!timer.isDone()) {
+                    timer.cancel(true);
+                    return false;
+                }
+                return true;
+            }));
 
             player.eventNode().addListener(GameSdkUtils.singleUseEvent(PlayerMoveEvent.class, f -> {
                 if (f.getPlayer().getPosition().distanceSquared(f.getNewPosition()) < Vec.EPSILON) {

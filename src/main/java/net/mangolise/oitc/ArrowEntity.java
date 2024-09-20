@@ -7,7 +7,7 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.*;
-import net.minestom.server.entity.metadata.projectile.ProjectileMeta;
+import net.minestom.server.entity.metadata.projectile.ArrowMeta;
 import net.minestom.server.event.EventDispatcher;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithBlockEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 
-import static net.mangolise.oitc.OITC.PLAYER_ARROW_PARTICLE;
+import static net.mangolise.oitc.OITC.*;
 
 public class ArrowEntity extends Entity {
     private final Player shooter;
@@ -30,9 +30,9 @@ public class ArrowEntity extends Entity {
         this.shooter = shooter;
 
         hasPhysics = false;
-        if (getEntityMeta() instanceof ProjectileMeta) {
-            ((ProjectileMeta) getEntityMeta()).setShooter(this.shooter);
-        }
+        editEntityMeta(ArrowMeta.class, meta -> {
+            meta.setShooter(shooter);
+        });
 
         setBoundingBox(new BoundingBox(0, 0, 0));
     }

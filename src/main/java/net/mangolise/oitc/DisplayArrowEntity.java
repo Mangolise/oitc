@@ -21,7 +21,6 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.thread.Acquirable;
-import net.minestom.server.utils.PacketUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +31,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static net.mangolise.oitc.OITC.PLAYER_ARROW_PARTICLE;
 
 public class DisplayArrowEntity extends Entity {
 

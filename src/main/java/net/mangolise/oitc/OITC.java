@@ -34,7 +34,6 @@ import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class OITC extends BaseGame<OITC.Config> {
