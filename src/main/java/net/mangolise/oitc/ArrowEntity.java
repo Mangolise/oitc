@@ -103,7 +103,7 @@ public class ArrowEntity extends Entity {
             BlockVec posBlock = new BlockVec(pos);
 
             // do collision check with shape
-            SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0);
+            SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0, 0, 0, 0);
             if (!block.registry().collisionShape().intersectBoxSwept(from, movement, posBlock.asVec(), boundingBox, result)) {
                 continue;
             }
@@ -128,7 +128,7 @@ public class ArrowEntity extends Entity {
                 continue;
             }
 
-            SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0);
+            SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0, 0, 0, 0);
             if (entity.getBoundingBox().intersectBoxSwept(from.asVec(), movement, entity.getPosition(), boundingBox, result)) {
                 final ProjectileCollideWithEntityEvent event = new ProjectileCollideWithEntityEvent(this, from, entity);
                 EventDispatcher.call(event);
