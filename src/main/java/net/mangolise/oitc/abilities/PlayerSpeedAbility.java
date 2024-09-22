@@ -34,6 +34,15 @@ public class PlayerSpeedAbility {
                 }
             }
 
+            if (AbilitiesFeature.abilityCountDown.containsKey(player.getUuid())) {
+                CompletableFuture<Void> sprintCooldown = AbilitiesFeature.abilityCountDown.get(player.getUuid());
+                if (!sprintCooldown.isDone()) {
+                    sprintCooldown.cancel(true);
+                    AbilitiesFeature.abilityCountDown.remove(player.getUuid());
+                    player.setLevel(0);
+                }
+            }
+
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
             GameSdkUtils.startCooldown(player, "speed", Material.BLAZE_POWDER, COOLDOWN_SECONDS * 1000);
             player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.18);
@@ -41,7 +50,10 @@ public class PlayerSpeedAbility {
             instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_WIND_BURST, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
             // 8 * 20 is converting the timer from seconds into ticks.
-            CompletableFuture<Void> sprintDuration = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> spawnParticle(i, player, instance));
+            CompletableFuture<Void> sprintDuration = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> {
+                player.setExp((float) i / (COOLDOWN_SECONDS * 20));
+                spawnParticle(i, player, instance);
+            });
 
             sprintDuration.thenRun(() -> {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);

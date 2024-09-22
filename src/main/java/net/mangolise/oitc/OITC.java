@@ -19,6 +19,8 @@ import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
+import net.minestom.server.entity.damage.Damage;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -178,8 +180,17 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(EntityAttackEvent.class, e -> {
             Entity entity = e.getTarget();
 
-            if (entity instanceof Player player && e.getEntity() instanceof Player attacker && attacker.getItemInMainHand().material() == Material.IRON_SWORD) {
-                AttackedFeature.attacked(player, attacker, true, instance);
+            if (!(entity instanceof Player victim) || !(e.getEntity() instanceof Player attacker)) {
+                return;
+            }
+
+            if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
+                    victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
+                return;
+            }
+
+            if (attacker.getItemInMainHand().material() == Material.IRON_SWORD) {
+                AttackedFeature.attacked(victim, attacker, true, instance);
             }
         });
     }
