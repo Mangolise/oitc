@@ -92,9 +92,13 @@ public class ParticleMenu {
             }
 
             ItemStack arrow = makeColoredArrow(particle, color).withTag(ARROW_PARTICLE, j).withGlowing(glowing);
+            Component lore = Component.text("Unable to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED);
 
-            Component lore = Component.text("Right-Click ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)
-                    .append(Component.text("to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GREEN));
+            if (player.getPosition().y() > 22.0) {
+                lore = Component.text("Right-Click ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)
+                        .append(Component.text("to preview").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GREEN));
+            }
+
 
             if (unlocked) {
                 arrow = arrow.withLore(lore);

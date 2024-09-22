@@ -78,6 +78,24 @@ public class KillMessages {
             " fell asleep at a gun range and was shot by "
     );
 
+    private static final List<String> randomMessagesSuicide = List.of(
+            " has become their own worst enemy.",
+            " faced off against themselves... and lost.",
+            " eliminated the biggest threat: themselves.",
+            " accidentally self-destructed.",
+            " was too much to handle… for themselves.",
+            " met their match... in the mirror.",
+            " was outplayed by their greatest rival: themselves.",
+            " died to themselves, embarrassing.",
+            " gave up.",
+            " didn't like this world.",
+            " couldn't handle their own power.",
+            " got outplayed by themselves.",
+            " failed the tutorial on living.",
+            " forgot who the real enemy was... it’s themselves.",
+            " can't win against themselves."
+    );
+
     public static void sendKillStreakMessage(int killStreak, Player attacker, Instance instance) {
         switch (killStreak) {
             case 5 -> killStreakMessage(instance, attacker, " is on ", "Fire", TextColor.color(255, 165, 43));
@@ -108,6 +126,12 @@ public class KillMessages {
         Random random = ThreadLocalRandom.current();
         String message;
 
+        if (attacker == victim) {
+            message = randomMessagesSuicide.get(random.nextInt(randomMessagesSuicide.size()));
+            randomDeathMessageSuicide(instance, victim, message);
+            return;
+        }
+
         if (random.nextDouble() > 0.666d) {
             if (fromSword) {
                 message = randomMessagesSword.get(random.nextInt(randomMessagesSword.size()));
@@ -125,6 +149,11 @@ public class KillMessages {
         instance.sendMessage(ChatUtil.getDisplayName(victim).decorate(TextDecoration.BOLD)
                 .append(Component.text(text).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE))
                 .append(ChatUtil.getDisplayName(attacker)).decorate(TextDecoration.BOLD));
+    }
+
+    public static void randomDeathMessageSuicide(Instance instance, Player victim, String text) {
+        instance.sendMessage(ChatUtil.getDisplayName(victim).decorate(TextDecoration.BOLD)
+                .append(Component.text(text).decoration(TextDecoration.BOLD, false).color(NamedTextColor.WHITE)));
     }
 
     public static void killStreakMessage(Instance instance, Player attacker, String middle, String end, TextColor color) {

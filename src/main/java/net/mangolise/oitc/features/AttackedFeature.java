@@ -36,17 +36,24 @@ public class AttackedFeature implements Game.Feature<OITC> {
             return;
         }
 
-        int killCount = attacker.getAndUpdateTag(OITC.PLAYER_KILLS, kills -> kills + 1) + 1;
-        victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
-        victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
-        attacker.updateTag(OITC.PLAYER_KILL_STREAK, streak -> streak + 1);
+        int killCount = attacker.getTag(OITC.PLAYER_KILLS);
 
-        if (fromSword) {
-            victim.updateTag(OITC.PLAYER_DEATHS_BY_SWORD, swordDeaths -> swordDeaths + 1);
-            attacker.updateTag(OITC.PLAYER_SWORD_KILLS, swordKills -> swordKills + 1);
+        if (victim != attacker) {
+            killCount = attacker.getAndUpdateTag(OITC.PLAYER_KILLS, kills -> kills + 1) + 1;
+            victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
+            victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
+            attacker.updateTag(OITC.PLAYER_KILL_STREAK, streak -> streak + 1);
+
+            if (fromSword) {
+                victim.updateTag(OITC.PLAYER_DEATHS_BY_SWORD, swordDeaths -> swordDeaths + 1);
+                attacker.updateTag(OITC.PLAYER_SWORD_KILLS, swordKills -> swordKills + 1);
+            } else {
+                victim.updateTag(OITC.PLAYER_DEATHS_BY_CROSSBOW, crossbowDeaths -> crossbowDeaths + 1);
+                attacker.updateTag(OITC.PLAYER_CROSSBOW_KILLS, crossbowKills -> crossbowKills + 1);
+            }
         } else {
-            victim.updateTag(OITC.PLAYER_DEATHS_BY_CROSSBOW, crossbowDeaths -> crossbowDeaths + 1);
-            attacker.updateTag(OITC.PLAYER_CROSSBOW_KILLS, crossbowKills -> crossbowKills + 1);
+            victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
+            victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
         }
 
         // instead of killing player, this fakes players death by teleporting them.
