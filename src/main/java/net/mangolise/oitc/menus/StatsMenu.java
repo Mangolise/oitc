@@ -46,7 +46,7 @@ public class StatsMenu {
         }
 
         Component killDeathsLore = Component.text("K/D Ratio: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
-                .append(Component.text(kdr).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+                .append(Component.text(String.format("%.2f", kdr)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
         inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore, killDeathsLore));
 
