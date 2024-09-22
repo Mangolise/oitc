@@ -189,7 +189,7 @@ public class DisplayArrowEntity extends Entity {
             final Point currentPos = pos;
             Stream<LivingEntity> victimsStream = entities.stream()
                     .filter(entity -> {
-                        SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0);
+                        SweepResult result = new SweepResult(Double.MAX_VALUE, 0, 0, 0, null, 0, 0, 0, 0, 0, 0);
                         return entity.getBoundingBox().intersectBoxSwept(currentPos, this.getVelocity(), entity.getPosition(), bb, result);
                     });
             /*
