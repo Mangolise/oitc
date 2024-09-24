@@ -40,6 +40,10 @@ public class StatsMenu {
                 .append(Component.text("Crossbow: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD))
                 .append(Component.text(player.getTag(OITC.PLAYER_CROSSBOW_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
+        Component revengeKillsLore = Component.text("Revenge ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
+                .append(Component.text("Kills: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
+                .append(Component.text(player.getTag(OITC.PLAYER_REVENGE_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+
         double kdr = player.getTag(OITC.PLAYER_KILLS);
         if (player.getTag(OITC.PLAYER_DEATHS) != 0) {
             kdr /= player.getTag(OITC.PLAYER_DEATHS);
@@ -48,7 +52,7 @@ public class StatsMenu {
         Component killDeathsLore = Component.text("K/D Ratio: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
                 .append(Component.text(String.format("%.2f", kdr)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
-        inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore, killDeathsLore));
+        inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore, revengeKillsLore, killDeathsLore));
 
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
         player.openInventory(inventory);

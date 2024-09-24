@@ -56,6 +56,8 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Integer> PLAYER_DEATHS = Tag.Integer("player_deaths").defaultValue(0);
     public static final Tag<Integer> PLAYER_DEATHS_BY_SWORD = Tag.Integer("player_deaths_by_sword").defaultValue(0);
     public static final Tag<Integer> PLAYER_DEATHS_BY_CROSSBOW = Tag.Integer("player_deaths_by_crossbow").defaultValue(0);
+    public static final Tag<Integer> PLAYER_REVENGE_KILLS = Tag.Integer("player_revenge_kills").defaultValue(0);
+    public static final Tag<UUID> PLAYER_LAST_KILLER = Tag.UUID("player_last_killer");
 
     public static final ItemStack crossbow = ItemStack.of(Material.CROSSBOW)
             .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
