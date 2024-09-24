@@ -8,11 +8,13 @@ public class KillEvent implements PlayerEvent {
     private final Player player;
     private final Player killer;
     private final int newKillCount;
+    private final boolean isRevenge;
 
-    public KillEvent(Player player, Player killer, int newKillCount) {
+    public KillEvent(Player player, Player killer, int newKillCount, boolean isRevenge) {
         this.player = player;
         this.killer = killer;
         this.newKillCount = newKillCount;
+        this.isRevenge = isRevenge;
     }
 
     @Override
@@ -26,5 +28,9 @@ public class KillEvent implements PlayerEvent {
 
     public int getNewKillCount() {
         return newKillCount;
+    }
+
+    public boolean isRevenge() {
+        return isRevenge;
     }
 }

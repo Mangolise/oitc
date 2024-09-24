@@ -30,6 +30,7 @@ public class AttackedFeature implements Game.Feature<OITC> {
     }
 
     public static void attacked(Player victim, Player attacker, boolean fromSword, Instance instance) {
+        boolean isRevenge = false;
         // player spawn is above y level 22
         if (victim.getPosition().y() > 22.0 || attacker.getPosition().y() > 22.0 ||
                 victim.getGameMode().equals(GameMode.SPECTATOR) || attacker.getGameMode().equals(GameMode.SPECTATOR)) {
@@ -39,11 +40,6 @@ public class AttackedFeature implements Game.Feature<OITC> {
         int killCount = attacker.getTag(OITC.PLAYER_KILLS);
 
         if (victim != attacker) {
-            if (victim.getUuid().equals(attacker.getTag(OITC.PLAYER_LAST_KILLER))) {
-                attacker.updateTag(OITC.PLAYER_REVENGE_KILLS, revenge_kills -> revenge_kills + 1);
-                attacker.removeTag(OITC.PLAYER_LAST_KILLER);
-            }
-
             killCount = attacker.getAndUpdateTag(OITC.PLAYER_KILLS, kills -> kills + 1) + 1;
             attacker.updateTag(OITC.PLAYER_KILL_STREAK, streak -> streak + 1);
 
@@ -59,13 +55,23 @@ public class AttackedFeature implements Game.Feature<OITC> {
                 victim.updateTag(OITC.PLAYER_DEATHS_BY_CROSSBOW, crossbowDeaths -> crossbowDeaths + 1);
                 attacker.updateTag(OITC.PLAYER_CROSSBOW_KILLS, crossbowKills -> crossbowKills + 1);
             }
+
+            if (victim.getUuid().equals(attacker.getTag(OITC.PLAYER_LAST_KILLER))) {
+                attacker.updateTag(OITC.PLAYER_REVENGE_KILLS, revenge_kills -> revenge_kills + 1);
+                attacker.removeTag(OITC.PLAYER_LAST_KILLER);
+                isRevenge = true;
+            }
         } else {
+            if (victim.getUuid().equals(attacker.getTag(OITC.PLAYER_LAST_KILLER))) {
+                isRevenge = true;
+            }
+
+            victim.setTag(OITC.PLAYER_LAST_KILLER, attacker.getUuid());
             victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
             victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
         }
 
         // instead of killing player, this fakes players death by teleporting them.
-        KillMessages.sendDeathMessage(instance, victim, attacker, fromSword);
         victim.setGameMode(GameMode.SPECTATOR);
         victim.playSound(Sound.sound(SoundEvent.ENTITY_PLAYER_DEATH, Sound.Source.PLAYER, 1f, 1f));
 
@@ -74,19 +80,26 @@ public class AttackedFeature implements Game.Feature<OITC> {
             victim.teleport(OITC.randomSpawn());
         });
 
-        attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
         setAmmo(attacker, attacker.getTag(OITC.PLAYERS_AMMO_TAG) + 1);
-
         setAmmo(victim, 1);
+
+        if (isRevenge) {
+            attacker.playSound(Sound.sound(SoundEvent.BLOCK_BELL_USE, Sound.Source.PLAYER, 0.75f, 1.5f));
+        } else {
+            attacker.playSound(Sound.sound(SoundEvent.BLOCK_AMETHYST_BLOCK_BREAK, Sound.Source.PLAYER, 1f, 2f));
+        }
 
         for (Player player : instance.getPlayers()) {
             ScoreboardFeature.updateSidebar(player);
         }
 
+        KillMessages.sendDeathMessage(victim, attacker, isRevenge);
+        KillMessages.sendKillMessage(attacker, victim, isRevenge);
+
         int killStreak = attacker.getTag(OITC.PLAYER_KILL_STREAK);
         KillMessages.sendKillStreakMessage(killStreak, attacker, instance);
 
-        KillEvent killEvent = new KillEvent(victim, attacker, killCount);
+        KillEvent killEvent = new KillEvent(victim, attacker, killCount, isRevenge);
         EventDispatcher.call(killEvent);
 
         Particle particle = Particle.POOF;
