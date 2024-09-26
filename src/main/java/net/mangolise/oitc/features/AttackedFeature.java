@@ -43,6 +43,10 @@ public class AttackedFeature implements Game.Feature<OITC> {
             killCount = attacker.getAndUpdateTag(OITC.PLAYER_KILLS, kills -> kills + 1) + 1;
             attacker.updateTag(OITC.PLAYER_KILL_STREAK, streak -> streak + 1);
 
+            if (attacker.getTag(OITC.PLAYER_KILL_STREAK) >= attacker.getTag(OITC.PLAYER_HIGHEST_KILL_STREAK)) {
+                attacker.setTag(OITC.PLAYER_HIGHEST_KILL_STREAK, attacker.getTag(OITC.PLAYER_KILL_STREAK));
+            }
+
             victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
             victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
 

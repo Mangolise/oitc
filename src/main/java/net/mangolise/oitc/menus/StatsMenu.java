@@ -4,6 +4,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.oitc.OITC;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
@@ -18,7 +19,10 @@ public class StatsMenu {
         inventory.setTag(OITC.MENU_ID, "stats_menu");
 
         ItemStack playerStats = ItemStack.of(Material.PLAYER_HEAD)
-                .withCustomName(Component.text("Your Stats").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_AQUA));
+                .withCustomName(ChatUtil.getDisplayName(player).decoration(TextDecoration.ITALIC, false)
+                        .append(Component.text(" Stats").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)));
+
+        Component lineBreak = Component.text("--------------------").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY);
 
         Component swordDeathLore = Component.text("Deaths ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
                 .append(Component.text("by ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY))
@@ -40,8 +44,12 @@ public class StatsMenu {
                 .append(Component.text("Crossbow: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD))
                 .append(Component.text(player.getTag(OITC.PLAYER_CROSSBOW_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
+        Component highestKillStreak = Component.text("Highest ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
+                .append(Component.text("Kill Streak: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY))
+                .append(Component.text(player.getTag(OITC.PLAYER_HIGHEST_KILL_STREAK)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+
         Component revengeKillsLore = Component.text("Revenge ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
-                .append(Component.text("Kills: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED))
+                .append(Component.text("Kills: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY))
                 .append(Component.text(player.getTag(OITC.PLAYER_REVENGE_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
         double kdr = player.getTag(OITC.PLAYER_KILLS);
@@ -52,7 +60,8 @@ public class StatsMenu {
         Component killDeathsLore = Component.text("K/D Ratio: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
                 .append(Component.text(String.format("%.2f", kdr)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
-        inventory.setItemStack(4, playerStats.withLore(swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore, revengeKillsLore, killDeathsLore));
+        inventory.setItemStack(4, playerStats.withLore(lineBreak, swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore,
+                lineBreak, revengeKillsLore, highestKillStreak, lineBreak, killDeathsLore));
 
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
         player.openInventory(inventory);

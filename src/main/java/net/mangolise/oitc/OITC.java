@@ -48,6 +48,7 @@ public class OITC extends BaseGame<OITC.Config> {
     public static final Tag<Particle> PLAYER_ARROW_PARTICLE = Tag.<Particle>Transient("particle").defaultValue(ParticleMenu.particles.getFirst().particle());
     public static final Tag<Color> PLAYER_ARROW_COLOR = Tag.<Color>Transient("player_arrow_color").defaultValue(ParticleMenu.particles.getFirst().color());
     public static final Tag<Integer> PLAYER_KILL_STREAK = Tag.Integer("kill_streak").defaultValue(0);
+    public static final Tag<Integer> PLAYER_HIGHEST_KILL_STREAK = Tag.Integer("highest_kill_streak").defaultValue(0);
     public static final Tag<String> MENU_ID = Tag.String("menu_id");
     public static final Tag<Sidebar> PLAYER_SIDEBAR = Tag.Transient("player_sidebar");
     public static final Tag<Integer> PLAYER_KILLS = Tag.Integer("player_kills").defaultValue(0);
