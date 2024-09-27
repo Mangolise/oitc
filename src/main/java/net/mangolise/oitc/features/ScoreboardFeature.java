@@ -36,9 +36,9 @@ public class ScoreboardFeature implements Game.Feature<OITC> {
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
 
         MinecraftServer.getConnectionManager().getOnlinePlayers().stream()
-                .sorted(Comparator.comparingInt(entry -> -entry.getTag(OITC.PLAYER_KILLS))).limit(5).forEach(attacker -> {
+                .sorted(Comparator.comparingInt(entry -> -entry.getTag(OITC.PLAYER_KILLS_PER_SESSION))).limit(5).forEach(attacker -> {
             sidebarBuilder.addLine(ChatUtil.getDisplayName(attacker)
-                    .append(Component.text(": " + attacker.getTag(OITC.PLAYER_KILLS)).color(NamedTextColor.GRAY)));
+                    .append(Component.text(": " + attacker.getTag(OITC.PLAYER_KILLS_PER_SESSION)).color(NamedTextColor.GRAY)));
         });
 
         sidebarBuilder.addLine(Component.text("----------------").color(NamedTextColor.DARK_GRAY));
