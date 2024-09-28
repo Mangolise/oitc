@@ -52,6 +52,9 @@ public class StatsMenu {
                 .append(Component.text("Kills: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY))
                 .append(Component.text(player.getTag(OITC.PLAYER_REVENGE_KILLS)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
+        Component suicidesLore = Component.text("Suicides: ").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED)
+                .append(Component.text(player.getTag(OITC.PLAYER_SUICIDE)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+
         double kdr = player.getTag(OITC.PLAYER_KILLS);
         if (player.getTag(OITC.PLAYER_DEATHS) != 0) {
             kdr /= player.getTag(OITC.PLAYER_DEATHS);
@@ -61,7 +64,7 @@ public class StatsMenu {
                 .append(Component.text(String.format("%.2f", kdr)).decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
 
         inventory.setItemStack(4, playerStats.withLore(lineBreak, swordDeathLore, crossbowDeathLore, swordKillsLore, crossbowKillsLore,
-                lineBreak, revengeKillsLore, highestKillStreak, lineBreak, killDeathsLore));
+                lineBreak, revengeKillsLore, highestKillStreak, suicidesLore, lineBreak, killDeathsLore));
 
         player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
         player.openInventory(inventory);

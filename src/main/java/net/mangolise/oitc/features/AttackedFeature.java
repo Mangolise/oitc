@@ -72,6 +72,7 @@ public class AttackedFeature implements Game.Feature<OITC> {
             }
 
             victim.setTag(OITC.PLAYER_LAST_KILLER, attacker.getUuid());
+            victim.updateTag(OITC.PLAYER_SUICIDE, suicides -> suicides + 1);
             victim.updateTag(OITC.PLAYER_DEATHS, deaths -> deaths + 1);
             victim.setTag(OITC.PLAYER_KILL_STREAK, 0);
         }
