@@ -57,17 +57,26 @@ public class PlayerDashAbility {
     }
 
     public static void playerDashParticle(Player player, Instance instance) {
-        Particle particle = Particle.WHITE_SMOKE;
+        Particle particleMain = Particle.WHITE_SMOKE;
+        Particle particleSecondary = Particle.CLOUD;
 
-        AtomicReference<Task> task = new AtomicReference<>();
-        task.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+        AtomicReference<Task> taskMain = new AtomicReference<>();
+        taskMain.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Pos playerPos = player.getPosition();
-            ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 5);
-            instance.sendGroupedPacket(packet);
+            ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 5);
+            instance.sendGroupedPacket(packetMain);
         }, TaskSchedule.nextTick(), TaskSchedule.tick(1)));
 
+        AtomicReference<Task> taskSecondary = new AtomicReference<>();
+        taskSecondary.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
+            Pos playerPos = player.getPosition();
+            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.15f, 2);
+            instance.sendGroupedPacket(packetSecondary);
+        }, TaskSchedule.nextTick(), TaskSchedule.tick(5)));
+
         MinecraftServer.getSchedulerManager().scheduleTask(() -> {
-            task.get().cancel();
+            taskMain.get().cancel();
+            taskSecondary.get().cancel();
         }, TaskSchedule.millis(350), TaskSchedule.stop());
     }
 }

@@ -84,10 +84,17 @@ public class PlayerSpeedAbility {
             return;
         }
 
-        Particle particle = Particle.FLAME;
+        Particle particleMain = Particle.FLAME;
+        Particle particleSecondary = Particle.LAVA;
+        Particle particleThird = Particle.SMOKE;
 
         Pos playerPos = player.getPosition();
-        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 10);
-        instance.sendGroupedPacket(packet);
+        ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 8);
+        ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.2f, 1);
+        ParticlePacket packetThird = new ParticlePacket(particleThird, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.15f, 4);
+
+        instance.sendGroupedPacket(packetMain);
+        instance.sendGroupedPacket(packetSecondary);
+        instance.sendGroupedPacket(packetThird);
     }
 }

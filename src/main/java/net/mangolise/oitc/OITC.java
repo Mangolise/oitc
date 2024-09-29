@@ -162,11 +162,11 @@ public class OITC extends BaseGame<OITC.Config> {
                 return;
             }
 
-            Pos spawnPosition = new Pos(player.getPosition().add(0, 1.5, 0));
+            Pos spawnPosition = new Pos(player.getPosition().add(0, 1.45, 0));
 
             ArrowEntity arrow = new ArrowEntity(player);
             arrow.setInstance(instance, spawnPosition);
-            arrow.setVelocity(player.getPosition().direction().mul(75));
+            arrow.setVelocity(player.getPosition().direction().mul(80));
 
             instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 

@@ -72,12 +72,16 @@ public class PlayerTeleportAbility {
     }
 
     public static void pearlParticle(Entity pearl, Instance instance) {
-        Particle particle = Particle.SCULK_CHARGE_POP;
+        Particle particleMain = Particle.SCULK_CHARGE_POP;
+        Particle particleSecondary = Particle.REVERSE_PORTAL;
 
         pearl.eventNode().addListener(EntityTickEvent.class, e -> {
             Pos entityPos = pearl.getPosition();
-            ParticlePacket packet = new ParticlePacket(particle, true, entityPos.x(), entityPos.y(), entityPos.z(), 0, 0, 0, 0.1f, 5);
-            instance.sendGroupedPacket(packet);
+            ParticlePacket packetMain = new ParticlePacket(particleMain, true, entityPos.x(), entityPos.y(), entityPos.z(), 0, 0, 0, 0.12f, 2);
+            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, entityPos.x(), entityPos.y(), entityPos.z(), 0, 0, 0, 0.1f, 15);
+
+            instance.sendGroupedPacket(packetMain);
+            instance.sendGroupedPacket(packetSecondary);
         });
     }
 }

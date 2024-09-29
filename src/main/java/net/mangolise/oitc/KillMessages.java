@@ -13,7 +13,7 @@ import net.minestom.server.sound.SoundEvent;
 public class KillMessages {
     public static void sendKillStreakMessage(int killStreak, Player attacker, Instance instance) {
         switch (killStreak) {
-            case 5 -> killStreakMessage(instance, attacker, " is on ", "Fire", TextColor.color(255, 165, 43), 1f, SoundEvent.ENTITY_WARDEN_SONIC_BOOM);
+            case 5 -> killStreakMessage(instance, attacker, " is on ", "Fire", TextColor.color(255, 142, 41), 1f, SoundEvent.ENTITY_WARDEN_SONIC_BOOM);
             case 10 -> killStreakMessage(instance, attacker, " is ", "Killing it", TextColor.color(163, 33, 0), 1f, SoundEvent.ENTITY_WARDEN_ROAR);
             case 15 -> killStreakMessage(instance, attacker, " is ", "Dominating", TextColor.color(92, 0, 2), 1f, SoundEvent.ENTITY_LIGHTNING_BOLT_THUNDER);
             case 20 -> killStreakMessage(instance, attacker, " is on a ", "Rampage", TextColor.color(255, 55, 30), 1f, SoundEvent.ENTITY_WARDEN_SONIC_BOOM);
@@ -32,7 +32,7 @@ public class KillMessages {
             case 350 -> killStreakMessage(instance, attacker, " I'm running out of ", "IDEAS", TextColor.color(75, 180, 193), 1f, SoundEvent.ENTITY_EVOKER_PREPARE_WOLOLO);
             case 450 -> killStreakMessage(instance, attacker, " is ", "Hacking", TextColor.color(118, 64, 123), 1f, SoundEvent.ENTITY_EVOKER_PREPARE_SUMMON);
             case 500 -> killStreakMessage(instance, attacker, " is playing ", "Fruit Ninja", TextColor.color(72, 206, 71), 1f, SoundEvent.ENTITY_ILLUSIONER_PREPARE_BLINDNESS);
-            case 550 -> killStreakMessage(instance, attacker, " if you made it this far Nice but ", "Theres nothing left until 1000.", TextColor.color(255, 0, 0), 1f, SoundEvent.ENTITY_ILLUSIONER_PREPARE_MIRROR);
+            case 550 -> killStreakMessage(instance, attacker, " if you made it this far Nice but ", "Theres nothing left until 1000.", TextColor.color(55, 0, 12), 1f, SoundEvent.ENTITY_ILLUSIONER_PREPARE_MIRROR);
             case 1000 -> killStreakMessage(instance, attacker, " Needs to go ", "Outside", TextColor.color(0, 108, 4), 1f, SoundEvent.BLOCK_END_PORTAL_SPAWN);
         }
     }
