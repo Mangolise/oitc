@@ -84,10 +84,10 @@ public class AttackedFeature implements Game.Feature<OITC> {
         Timer.countDownForPlayer(3, victim).thenRun(() -> {
             victim.setGameMode(GameMode.ADVENTURE);
             victim.teleport(OITC.randomSpawn());
+            setAmmo(victim, 1);
         });
 
         setAmmo(attacker, attacker.getTag(OITC.PLAYERS_AMMO_TAG) + 1);
-        setAmmo(victim, 1);
 
         if (isRevenge) {
             attacker.playSound(Sound.sound(SoundEvent.BLOCK_BELL_USE, Sound.Source.PLAYER, 0.75f, 1.5f));

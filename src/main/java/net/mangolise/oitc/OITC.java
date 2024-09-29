@@ -19,8 +19,6 @@ import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
-import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEvent;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
@@ -162,11 +160,11 @@ public class OITC extends BaseGame<OITC.Config> {
                 return;
             }
 
-            Pos spawnPosition = new Pos(player.getPosition().add(0, 1.45, 0));
+            Pos spawnPosition = new Pos(player.getPosition().add(0, player.getEyeHeight() - 0.3, 0));
 
             ArrowEntity arrow = new ArrowEntity(player);
             arrow.setInstance(instance, spawnPosition);
-            arrow.setVelocity(player.getPosition().direction().mul(80));
+            arrow.setVelocity(player.getPosition().direction().mul(80).add(0, 3, 0));
 
             instance.playSound(Sound.sound(SoundEvent.ITEM_CROSSBOW_SHOOT, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
