@@ -14,7 +14,6 @@ import net.minestom.server.event.entity.projectile.ProjectileCollideWithEntityEv
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
-import net.minestom.server.utils.PacketUtils;
 import net.minestom.server.utils.block.BlockIterator;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +61,7 @@ public class ArrowEntity extends Entity {
         while (travelled < total) {
             Pos pos = from.add(to.sub(from).asVec().normalize().mul(travelled));
             ParticlePacket packet = new ParticlePacket(this.shooter.getTag(PLAYER_ARROW_PARTICLE), pos, Vec.ZERO, 0, 1);
-            PacketUtils.sendGroupedPacket(this.getViewers(), packet);
+            sendPacketToViewers(packet);
             travelled += step;
         }
 
@@ -120,11 +119,9 @@ public class ArrowEntity extends Entity {
 
         // Collide with entities
         for (Entity entity : instance.getNearbyEntities(from, length * 4d)) {
-            if (!(entity instanceof LivingEntity)) {
-                continue;
-            }
-
-            if (aliveTicks < 3 && entity == shooter) {
+            if (!(entity instanceof LivingEntity) ||
+                    (entity instanceof Player player && player.getGameMode().equals(GameMode.SPECTATOR)) ||
+                    (aliveTicks < 3 && entity == shooter)) {
                 continue;
             }
 
