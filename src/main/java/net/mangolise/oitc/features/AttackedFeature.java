@@ -156,7 +156,8 @@ public class AttackedFeature implements Game.Feature<OITC> {
     public static void poof(Particle particle, Player victim, float ExplosionSpeed, Instance instance, int particleAmount) {
         Pos playerPos = victim.getPosition().sub(0, 1, 0);
 
-        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(), 0, 0, 0, ExplosionSpeed, particleAmount);
+        ParticlePacket packet = new ParticlePacket(particle, true, playerPos.x(), playerPos.y() + 1.5, playerPos.z(),
+                0, 0, 0, ExplosionSpeed, particleAmount);
         instance.sendGroupedPacket(packet);
     }
 }

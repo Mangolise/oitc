@@ -89,9 +89,12 @@ public class PlayerSpeedAbility {
         Particle particleThird = Particle.SMOKE;
 
         Pos playerPos = player.getPosition();
-        ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 8);
-        ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.2f, 1);
-        ParticlePacket packetThird = new ParticlePacket(particleThird, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.15f, 4);
+        ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(),
+                0, 0, 0, 0.1f, 8);
+        ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(),
+                0, 0, 0, 0.2f, 1);
+        ParticlePacket packetThird = new ParticlePacket(particleThird, true, playerPos.x(), playerPos.y(), playerPos.z(), 0,
+                0, 0, 0.15f, 4);
 
         instance.sendGroupedPacket(packetMain);
         instance.sendGroupedPacket(packetSecondary);

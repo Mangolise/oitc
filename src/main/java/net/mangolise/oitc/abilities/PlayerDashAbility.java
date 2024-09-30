@@ -63,14 +63,16 @@ public class PlayerDashAbility {
         AtomicReference<Task> taskMain = new AtomicReference<>();
         taskMain.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Pos playerPos = player.getPosition();
-            ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.1f, 5);
+            ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(),
+                    0, 0, 0, 0.1f, 5);
             instance.sendGroupedPacket(packetMain);
         }, TaskSchedule.nextTick(), TaskSchedule.tick(1)));
 
         AtomicReference<Task> taskSecondary = new AtomicReference<>();
         taskSecondary.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Pos playerPos = player.getPosition();
-            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(), 0, 0, 0, 0.15f, 2);
+            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(),
+                    0, 0, 0, 0.15f, 2);
             instance.sendGroupedPacket(packetSecondary);
         }, TaskSchedule.nextTick(), TaskSchedule.tick(5)));
 
