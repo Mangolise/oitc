@@ -122,7 +122,8 @@ public class OITC extends BaseGame<OITC.Config> {
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
 
         MinecraftServer.getGlobalEventHandler().addListener(InventoryPreClickEvent.class, e -> {
-            if (e.getClickedItem().material().equals(Material.TIPPED_ARROW) || e.getClickedItem().material().equals(Material.COMPASS)) {
+            if (e.getClickedItem().material().equals(Material.TIPPED_ARROW) || e.getClickedItem().material().equals(Material.COMPASS)
+                    || e.getSlot() == 7 || e.getSlot() == 8) {
                 e.setCancelled(true);
             }
 
