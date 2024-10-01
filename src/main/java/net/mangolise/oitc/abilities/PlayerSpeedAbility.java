@@ -17,6 +17,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PlayerSpeedAbility {
     private static final int COOLDOWN_SECONDS = 6;
@@ -45,36 +46,46 @@ public class PlayerSpeedAbility {
 
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
             GameSdkUtils.startCooldown(player, "speed", Material.BLAZE_POWDER, COOLDOWN_SECONDS * 1000);
+
             player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.18);
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
             instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_WIND_BURST, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
             // 8 * 20 is converting the timer from seconds into ticks.
-            CompletableFuture<Void> sprintDuration = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> {
+            CompletableFuture<Void> abilityUseDuration = Timer.countDown(COOLDOWN_SECONDS * 20, 1, i -> {
                 player.setExp((float) i / (COOLDOWN_SECONDS * 20));
                 spawnParticle(i, player, instance);
             });
-
-            sprintDuration.thenRun(() -> {
+            abilityUseDuration.thenRun(() -> {
                 player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_ILLUSIONER_CAST_SPELL, Sound.Source.PLAYER, 1f, 1f));
-                CompletableFuture<Void> timer = Timer.countDown(10 * 20, 1, i -> {
+
+                AtomicReference<CompletableFuture<Void>> visualCoolDownTimerRef = new AtomicReference<>();
+                CompletableFuture<Void> visualCoolDownTimer = Timer.countDown(10 * 20, 1, i -> {
+                    if (player.getTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY)) {
+                        visualCoolDownTimerRef.get().complete(null);
+                        return;
+                    }
+
                     player.setExp(1 - ((float) i / (10f * 20f)));
 
                     if (i % 20 == 0) {
                         player.setLevel(i / 20);
                     }
                 });
-                timer.thenRun(() -> {
+                visualCoolDownTimerRef.set(visualCoolDownTimer);
+
+                visualCoolDownTimer.thenRun(() -> {
                     player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, true);
                     player.setLevel(0);
                     player.setExp(1);
                     player.playSound(Sound.sound(SoundEvent.BLOCK_RESPAWN_ANCHOR_CHARGE, Sound.Source.PLAYER, 1f, 1f));
                 });
-                AbilitiesFeature.abilityCountDown.put(player.getUuid(), timer);
+
+                AbilitiesFeature.abilityCountDown.put(player.getUuid(), visualCoolDownTimer);
                 GameSdkUtils.startCooldown(player, "speedability", Material.RABBIT_FOOT, 10 * 1000);
             });
-            player.setTag(AbilitiesFeature.PLAYER_CURRENT_ABILITY, sprintDuration);
+            player.setTag(AbilitiesFeature.PLAYER_CURRENT_ABILITY, abilityUseDuration);
         }
     }
 
