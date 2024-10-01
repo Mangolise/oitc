@@ -18,6 +18,7 @@ repositories {
 dependencies {
     implementation("net.mangolise:mango-game-sdk:latest")
     implementation("net.minestom:minestom-snapshots:d0754f2a15")
+    implementation("net.mangolise:mango-combat:latest")
 }
 
 java {

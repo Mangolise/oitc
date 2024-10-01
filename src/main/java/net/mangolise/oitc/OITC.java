@@ -5,6 +5,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.combat.CombatConfig;
+import net.mangolise.combat.MangoCombat;
+import net.mangolise.combat.events.PlayerAttackEvent;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
@@ -78,6 +81,19 @@ public class OITC extends BaseGame<OITC.Config> {
         instance.enableAutoChunkLoad(true);
 
         MinecraftServer.getCommandManager().register(new ParticleCommand());
+
+        MangoCombat.enableGlobal(CombatConfig.create());
+
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerAttackEvent.class, e -> {
+            if (e.attacker().getPosition().y() > 22.0 || e.victim().getPosition().y() > 22.0
+                    || e.attacker().getGameMode().equals(GameMode.SPECTATOR)
+                    || e.attacker().getItemInMainHand().material().equals(Material.IRON_SWORD)) {
+                e.setCancelled(true);
+                return;
+            }
+
+            e.setDamage(0);
+        });
 
         MinecraftServer.getGlobalEventHandler().addListener(AsyncPlayerConfigurationEvent.class, e -> {
             Player player = e.getPlayer();
