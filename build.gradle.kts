@@ -65,6 +65,6 @@ publishing {
 tasks.withType<Jar> {
     manifest {
         // Change this to your main class
-        attributes["Main-Class"] = "net.mangolise.paintball.Test"
+        attributes["Main-Class"] = "net.mangolise.oitc.Test"
     }
 }
