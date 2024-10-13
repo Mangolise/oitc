@@ -173,6 +173,11 @@ public class OITC extends BaseGame<OITC.Config> {
                 return;
             }
 
+            if (heldItem.material().equals(Material.CROSSBOW) && player.getPosition().y() > 22.0) {
+                e.setCancelled(true);
+                return;
+            }
+
             if (heldItem.material().equals(Material.COMPASS)) {
                 OitcMenu.openMenu(player);
                 e.setCancelled(true);
