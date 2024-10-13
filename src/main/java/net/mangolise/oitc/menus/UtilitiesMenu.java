@@ -4,6 +4,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.OITC;
@@ -15,6 +16,7 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
@@ -41,7 +43,7 @@ public class UtilitiesMenu {
         player.openInventory(inventory);
     }
 
-    public static void handlePreClickEvent(InventoryPreClickEvent e, Player player) {
+    public static void handlePreClickEvent(InventoryPreClickEvent e, Player player, Instance instance) {
         if (!"utilities_menu".equals(e.getInventory().getTag(OITC.MENU_ID))) {
             return;
         }

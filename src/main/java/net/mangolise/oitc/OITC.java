@@ -11,6 +11,7 @@ import net.mangolise.combat.events.PlayerAttackEvent;
 import net.mangolise.gamesdk.BaseGame;
 import net.mangolise.gamesdk.features.AdminCommandsFeature;
 import net.mangolise.gamesdk.features.NoCollisionFeature;
+import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.GameSdkUtils;
 import net.mangolise.oitc.commands.ParticleCommand;
 import net.mangolise.oitc.features.AbilitiesFeature;
@@ -125,6 +126,9 @@ public class OITC extends BaseGame<OITC.Config> {
             player.getInventory().setItemStack(8, ItemStack.of(Material.COMPASS)
                     .withCustomName(Component.text("OITC Menu").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.AQUA)));
 
+            instance.sendMessage(Component.text("JOIN! ").color(NamedTextColor.GREEN).decoration(TextDecoration.BOLD, true)
+                    .append(ChatUtil.getDisplayName(player).decoration(TextDecoration.BOLD, false)));
+
             AttackedFeature.setAmmo(e.getPlayer(), 1);
         });
 
@@ -133,6 +137,8 @@ public class OITC extends BaseGame<OITC.Config> {
             for (Player player1 : instance.getPlayers()) {
                 ScoreboardFeature.updateSidebar(player1);
             }
+            instance.sendMessage(Component.text("QUIT! ").color(NamedTextColor.RED).decoration(TextDecoration.BOLD, true)
+                    .append(ChatUtil.getDisplayName(e.getPlayer()).decoration(TextDecoration.BOLD, false)));
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(ItemDropEvent.class, e -> e.setCancelled(true));
@@ -155,7 +161,7 @@ public class OITC extends BaseGame<OITC.Config> {
             ParticleMenu.handlePreClickEvent(e);
             SpawnMenu.handlePreClickEvent(e, e.getPlayer());
             AbilitiesMenu.handlePreClickEvent(e, e.getPlayer());
-            UtilitiesMenu.handlePreClickEvent(e, e.getPlayer());
+            UtilitiesMenu.handlePreClickEvent(e, e.getPlayer(), instance);
         });
 
         MinecraftServer.getGlobalEventHandler().addListener(PlayerUseItemEvent.class, e -> {
