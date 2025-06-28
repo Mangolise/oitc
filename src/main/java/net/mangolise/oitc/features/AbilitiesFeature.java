@@ -51,7 +51,7 @@ public class AbilitiesFeature implements Game.Feature<OITC> {
             if (!sprintDuration.isDone()) {
                 sprintDuration.cancel(true);
                 player.setExp(1);
-                player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+                player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1);
             }
         }
 

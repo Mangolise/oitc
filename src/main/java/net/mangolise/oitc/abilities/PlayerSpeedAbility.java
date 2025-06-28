@@ -47,7 +47,7 @@ public class PlayerSpeedAbility {
             MinecraftServer.getGlobalEventHandler().call(new PlayerAbilityEvent(player, COOLDOWN_SECONDS * 1000));
             GameSdkUtils.startCooldown(player, "speed", Material.BLAZE_POWDER, COOLDOWN_SECONDS * 1000);
 
-            player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.18);
+            player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.18);
             player.setTag(AbilitiesFeature.PLAYER_CAN_USE_ABILITY, false);
             instance.playSound(Sound.sound(SoundEvent.ENTITY_BREEZE_WIND_BURST, Sound.Source.PLAYER, 3f, 1f), player.getPosition());
 
@@ -57,7 +57,7 @@ public class PlayerSpeedAbility {
                 spawnParticle(i, player, instance);
             });
             abilityUseDuration.thenRun(() -> {
-                player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+                player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1);
                 player.playSound(Sound.sound(SoundEvent.ENTITY_ILLUSIONER_CAST_SPELL, Sound.Source.PLAYER, 1f, 1f));
 
                 AtomicReference<CompletableFuture<Void>> visualCoolDownTimerRef = new AtomicReference<>();
@@ -100,12 +100,12 @@ public class PlayerSpeedAbility {
         Particle particleThird = Particle.SMOKE;
 
         Pos playerPos = player.getPosition();
-        ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(),
-                0, 0, 0, 0.1f, 8);
-        ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(),
-                0, 0, 0, 0.2f, 1);
-        ParticlePacket packetThird = new ParticlePacket(particleThird, true, playerPos.x(), playerPos.y(), playerPos.z(), 0,
-                0, 0, 0.15f, 4);
+        ParticlePacket packetMain = new ParticlePacket(particleMain, true, true,
+                new Pos(playerPos.x(), playerPos.y(), playerPos.z()), new Pos(0, 0, 0), 0.1f, 8);
+        ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, true,
+                new Pos(playerPos.x(), playerPos.y(), playerPos.z()), new Pos(0, 0, 0), 0.2f, 1);
+        ParticlePacket packetThird = new ParticlePacket(particleThird, true, true,
+                new Pos(playerPos.x(), playerPos.y(), playerPos.z()), new Pos(0, 0, 0), 0.15f, 4);
 
         instance.sendGroupedPacket(packetMain);
         instance.sendGroupedPacket(packetSecondary);

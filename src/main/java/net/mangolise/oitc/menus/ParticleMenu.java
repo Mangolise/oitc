@@ -5,20 +5,22 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.mangolise.gamesdk.permissions.Permissions;
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.DisplayArrowEntity;
 import net.mangolise.oitc.OITC;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
+import net.minestom.server.inventory.click.Click;
 import net.minestom.server.inventory.click.ClickType;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.PotionContents;
@@ -86,7 +88,7 @@ public class ParticleMenu {
 
             Color color = coloredParticle.color();
 
-            boolean unlocked = player.hasPermission("oitc.particle." + particle.key().value());
+            boolean unlocked = Permissions.hasPermission(player, ("oitc.particle." + particle.key().value()));
             if (!unlocked) {
                 color = new Color(150, 150, 150);
             }
@@ -131,18 +133,18 @@ public class ParticleMenu {
         Player player = e.getPlayer();
         ColoredParticle particle = particles.get(clickedItem.getTag(ARROW_PARTICLE));
 
-        if (e.getClickType().equals(ClickType.RIGHT_CLICK) && e.getPlayer().getPosition().y() > 22.0 && e.getPlayer().getPosition().y() < 60) {
+        if (e.getClick() instanceof Click.Right && e.getPlayer().getPosition().y() > 22.0 && e.getPlayer().getPosition().y() < 60) {
             preview(player, particle);
             player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
             return;
         }
 
-        if (!player.hasPermission("oitc.particle." + particle.particle().key().value())) {
+        if (!Permissions.hasPermission(player, "oitc.particle." + particle.particle().key().value())) {
             player.playSound(Sound.sound(SoundEvent.ENTITY_VILLAGER_NO, Sound.Source.PLAYER, 1f, 1f));
             return;
         }
 
-        if (e.getClickType().equals(ClickType.RIGHT_CLICK)) {
+        if (e.getClick() instanceof Click.Right) {
             return;
         } else {
             player.playSound(Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, 1f, 1f));
@@ -160,7 +162,7 @@ public class ParticleMenu {
     }
 
     private static ItemStack makeColoredArrow(Particle particle, Color color) {
-        return ItemStack.of(Material.TIPPED_ARROW).with(ItemComponent.POTION_CONTENTS, new PotionContents(PotionType.AWKWARD, color)).withoutExtraTooltip()
+        return ItemStack.of(Material.TIPPED_ARROW).with(DataComponents.POTION_CONTENTS, new PotionContents(PotionType.AWKWARD, color)).withoutExtraTooltip()
                 .withCustomName(makeArrowName(particle, color));
     }
 

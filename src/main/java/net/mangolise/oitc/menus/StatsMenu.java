@@ -9,7 +9,6 @@ import net.mangolise.oitc.OITC;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.HeadProfile;
@@ -25,7 +24,7 @@ public class StatsMenu {
                         .append(Component.text(" Stats").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)));
 
         if (player.getSkin() != null) {
-            playerStats = playerStats.with(ItemComponent.PROFILE, new HeadProfile(player.getSkin()));
+            //playerStats = playerStats.with(, new HeadProfile(player.getSkin()));
         }
 
         Component lineBreak = Component.text("--------------------").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY);

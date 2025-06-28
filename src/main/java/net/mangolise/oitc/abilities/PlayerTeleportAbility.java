@@ -77,10 +77,10 @@ public class PlayerTeleportAbility {
 
         pearl.eventNode().addListener(EntityTickEvent.class, e -> {
             Pos entityPos = pearl.getPosition();
-            ParticlePacket packetMain = new ParticlePacket(particleMain, true, entityPos.x(), entityPos.y(), entityPos.z(),
-                    0, 0, 0, 0.12f, 2);
-            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, entityPos.x(), entityPos.y(), entityPos.z(),
-                    0, 0, 0, 0.1f, 15);
+            ParticlePacket packetMain = new ParticlePacket(particleMain, true, true,
+                    new Pos(entityPos.x(), entityPos.y(), entityPos.z()), new Pos(0, 0, 0), 0.12f, 2);
+            ParticlePacket packetSecondary = new ParticlePacket(particleMain, true, true,
+                    new Pos(entityPos.x(), entityPos.y(), entityPos.z()), new Pos(0, 0, 0), 0.1f, 15);
 
             instance.sendGroupedPacket(packetMain);
             instance.sendGroupedPacket(packetSecondary);
