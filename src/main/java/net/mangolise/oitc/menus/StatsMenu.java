@@ -6,10 +6,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.mangolise.gamesdk.util.ChatUtil;
 import net.mangolise.oitc.OITC;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.entity.Player;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.component.HeadProfile;
@@ -25,7 +25,7 @@ public class StatsMenu {
                         .append(Component.text(" Stats").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD)));
 
         if (player.getSkin() != null) {
-            playerStats = playerStats.with(ItemComponent.PROFILE, new HeadProfile(player.getSkin()));
+            playerStats = playerStats.with(DataComponents.PROFILE, new HeadProfile(player.getSkin()));
         }
 
         Component lineBreak = Component.text("--------------------").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GRAY);

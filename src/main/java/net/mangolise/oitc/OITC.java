@@ -20,6 +20,8 @@ import net.mangolise.oitc.features.ScoreboardFeature;
 import net.mangolise.oitc.menus.*;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.color.Color;
+import net.minestom.server.component.DataComponent;
+import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.attribute.Attribute;
@@ -29,7 +31,6 @@ import net.minestom.server.event.inventory.InventoryPreClickEvent;
 import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.item.ItemComponent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.particle.Particle;
@@ -68,7 +69,7 @@ public class OITC extends BaseGame<OITC.Config> {
             .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
     public static final ItemStack arrow = ItemStack.of(Material.ARROW)
             .withCustomName(Component.text("Arrow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
-    public static final ItemStack chargedCrossbow = crossbow.with(ItemComponent.CHARGED_PROJECTILES, List.of(arrow))
+    public static final ItemStack chargedCrossbow = crossbow.with(DataComponents.CHARGED_PROJECTILES, List.of(arrow))
             .withCustomName(Component.text("Crossbow").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GOLD));
 
     public static Map<UUID, CompletableFuture<Void>> arrowCountdown = new HashMap<>();
@@ -115,7 +116,7 @@ public class OITC extends BaseGame<OITC.Config> {
                 ScoreboardFeature.updateSidebar(player1);
             }
 
-            player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1000);
+            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(1000);
 
             player.setRespawnPoint(GameSdkUtils.getSpawnPosition(instance));
             player.teleport(randomSpawn().add(0, 1, 0));
@@ -147,10 +148,6 @@ public class OITC extends BaseGame<OITC.Config> {
             if (e.getClickedItem().material().equals(Material.TIPPED_ARROW) || e.getClickedItem().material().equals(Material.COMPASS)
                     || e.getSlot() == 7 || e.getSlot() == 8) {
                 e.setCancelled(true);
-            }
-
-            if (e.getInventory() == null) {
-                return;
             }
 
             if (e.getInventory().hasTag(MENU_ID)) {

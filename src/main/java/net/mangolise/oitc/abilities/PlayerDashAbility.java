@@ -6,6 +6,7 @@ import net.mangolise.gamesdk.util.Timer;
 import net.mangolise.oitc.events.PlayerAbilityEvent;
 import net.mangolise.oitc.features.AbilitiesFeature;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
@@ -63,16 +64,18 @@ public class PlayerDashAbility {
         AtomicReference<Task> taskMain = new AtomicReference<>();
         taskMain.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Pos playerPos = player.getPosition();
-            ParticlePacket packetMain = new ParticlePacket(particleMain, true, playerPos.x(), playerPos.y(), playerPos.z(),
-                    0, 0, 0, 0.1f, 5);
+            ParticlePacket packetMain = new ParticlePacket(particleMain, true, true,
+                    new Pos(playerPos.x(), playerPos.y(), playerPos.z()),
+                    new Pos(0, 0, 0), 0.1f, 5);
             instance.sendGroupedPacket(packetMain);
         }, TaskSchedule.nextTick(), TaskSchedule.tick(1)));
 
         AtomicReference<Task> taskSecondary = new AtomicReference<>();
         taskSecondary.set(MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             Pos playerPos = player.getPosition();
-            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, playerPos.x(), playerPos.y(), playerPos.z(),
-                    0, 0, 0, 0.15f, 2);
+            ParticlePacket packetSecondary = new ParticlePacket(particleSecondary, true, true,
+                    new Pos(playerPos.x(), playerPos.y(), playerPos.z()),
+                    new Pos(0, 0, 0), 0.15f, 2);
             instance.sendGroupedPacket(packetSecondary);
         }, TaskSchedule.nextTick(), TaskSchedule.tick(5)));
 
